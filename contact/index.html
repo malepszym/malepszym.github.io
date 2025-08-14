@@ -11,39 +11,55 @@
     :root{
       --bg:#eee;        /* tło */
       --fg:#111;        /* kolor tekstu */
-      --muted:#bfbfbf;  /* szary dla drobnych elementów */
+      --muted:#bfbfbf;  /* jasny napis "contact" */
       --underline:3px;  /* grubość podkreślenia */
       --offset:6px;     /* odległość linii od tekstu */
-      --maxw:900px;
+      --maxw:1200px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0; background:var(--bg); color:var(--fg);
       font-family: Inter, system-ui, Arial, sans-serif; line-height:1.6;
-      display:flex; min-height:100vh; flex-direction:column;
+      min-height:100vh; display:flex; flex-direction:column;
     }
     .container{max-width:var(--maxw); margin:0 auto; padding:clamp(16px,3vw,32px); width:100%}
-    .top{display:flex; align-items:center; justify-content:space-between; gap:16px}
-    .brand{
-      text-decoration:none; color:inherit;
+
+    /* górny pasek */
+    .top{display:flex; align-items:center; justify-content:space-between}
+    .back{
+      display:inline-flex; align-items:center; gap:12px;
+      text-decoration:none; color:inherit; cursor:pointer;
       font-family:"Archivo Black", system-ui, sans-serif; font-size:22px;
     }
-    .muted{color:var(--muted); font-size:14px}
+    .arrow{font-size:28px; line-height:1; transform:translateY(-1px)}
+    .back:hover .arrow{transform:translate(-2px,-1px)}
+    .section-label{color:var(--muted); font-weight:700; text-transform:lowercase}
+
+    /* tytuł */
     .title{
       font-family:"Archivo Black", system-ui, sans-serif;
-      font-size:clamp(32px,5vw,56px); line-height:1.1; margin:24px 0 12px;
+      text-align:center;
+      font-size:clamp(44px, 10vw, 112px);
+      line-height:1.05; margin:clamp(24px,6vh,48px) 0;
+      letter-spacing:1px;
     }
 
-    /* lista CTA */
-    .cta-list{display:grid; gap:16px; margin-top:8px}
-    .cta{
-      position:relative; display:inline-block;
-      font-family:"Archivo Black", system-ui, sans-serif;
-      font-size:clamp(32px,5vw,48px);
-      text-decoration:none; color:inherit; outline:0;
+    /* „chaotyczne” rozmieszczenie */
+    .scatter{
+      position:relative;
+      min-height:52vh;  /* obszar do rozmieszczenia napisów */
+      isolation:isolate;
     }
-    /* hover underline */
+    .cta{
+      position:absolute;
+      display:inline-block;
+      font-family:"Archivo Black", system-ui, sans-serif;
+      font-size:clamp(28px, 5vw, 56px);
+      text-decoration:none; color:inherit;
+      outline:0; cursor:pointer;
+    }
+    /* podkreślenie na hover */
     .cta::after{
       content:""; position:absolute; left:0; bottom:calc(var(--offset) * -1);
       width:0; height:var(--underline); background:currentColor; transition:width .25s ease;
@@ -51,26 +67,48 @@
     .cta:hover::after{ width:100% }
     .cta:focus-visible{ outline:3px solid #000; outline-offset:6px; border-radius:6px }
 
+    /* Konkretne pozycje (dopasuj procenty, jeśli chcesz) */
+    #cta-mail { left:12%;  top:28%; }   /* lewo-środek */
+    #cta-dm   { right:10%; top:46%; }   /* prawo-środek */
+    #cta-li   { left:18%;  bottom:6%; } /* dół-lewo  */
+
     footer{margin-top:auto; border-top:1px solid #e5e5e5}
-    footer .container{ color:var(--muted); font-size:14px }
+    footer .container{ color:#9aa0a6; font-size:14px }
+    
+    /* Mobile: układ pod sobą */
+    @media (max-width: 720px){
+      .scatter{ min-height:0; display:grid; gap:24px; justify-items:center; }
+      .cta{ position:static; }
+    }
+    /* Preferencje dostępności: bez animacji */
+    @media (prefers-reduced-motion: reduce){
+      .cta::after{ transition:none }
+      .back:hover .arrow{ transform:none }
+    }
   </style>
 </head>
 <body>
   <header class="container top">
-    <a class="brand" href="/">malepszym</a>
-    <span class="muted">contact</span>
+    <a class="back" href="/" aria-label="Wróć na stronę główną">
+      <span class="arrow">←</span>
+      <span>malepszym</span>
+    </a>
+    <span class="section-label">contact</span>
   </header>
 
   <main class="container">
-    <h1 class="title">Get in touch</h1>
-    <div class="cta-list">
-      <a class="cta" href="mailto:martyna.malepszy@gmail.com" aria-label="Wyślij do mnie maila">Mail me</a>
-      <a class="cta" href="https://www.linkedin.com/in/martyna-malepszy-616598207/" target="_blank" rel="noopener noreferrer" aria-label="Otwórz mój profil na LinkedIn">LinkedIn</a>
-      <a class="cta" href="https://ig.me/m/malepszym" target="_blank" rel="noopener noreferrer" aria-label="Napisz do mnie na Instagramie">DM Me</a>
+    <h1 class="title">GET IN TOUCH</h1>
+
+    <div class="scatter" aria-label="Sposoby kontaktu">
+      <a id="cta-mail" class="cta" href="mailto:martyna.malepszy@gmail.com" aria-label="Wyślij do mnie maila">mail me</a>
+      <a id="cta-dm" class="cta" href="https://ig.me/m/malepszym" target="_blank" rel="noopener noreferrer" aria-label="Napisz do mnie na Instagramie">DM me</a>
+      <a id="cta-li" class="cta" href="https://www.linkedin.com/in/martyna-malepszy-616598207/" target="_blank" rel="noopener noreferrer" aria-label="Otwórz mój profil na LinkedIn">linkedin</a>
     </div>
   </main>
 
   <footer>
     <div class="container">© <span id="y"></span> malepszym</div>
   </footer>
-  <script>document.getElementById('y').textContent = new
+  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+</body>
+</html>
