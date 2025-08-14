@@ -39,6 +39,36 @@
 @media (max-width:700px){
   .push-right { margin-left: 0; }
 }
+    /* --- MOBILE LIGHTBOX FIX --- */
+@media (max-width: 768px){
+  .lightbox{ padding: 8px }                 /* mniej marginesu dookoła */
+  .lb-btn{ width:36px; height:36px; font-size:20px }
+  .lb-close{ top:8px; right:8px }
+
+  /* wysokość toru = bezpieczne % wysokości ekranu, z nowymi jednostkami */
+  .lb-track{
+    width: 100vw;
+    height: 72vh;    /* fallback */
+    height: 72svh;   /* „safe” – odejmuje paski */
+    height: 72dvh;   /* „dynamic” – najlepsze na iOS 16+ */
+  }
+
+  /* obraz zawsze w proporcjach, w całości w środku */
+  .lb-track img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+/* ewentualnie bardzo małe ekrany – jeszcze trochę niżej */
+@media (max-width: 380px){
+  .lb-track{
+    height: 66vh;
+    height: 66svh;
+    height: 66dvh;
+  }
+}
   </style>
 </head>
 <body>
