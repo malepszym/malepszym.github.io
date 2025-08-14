@@ -180,6 +180,32 @@
     height: 66dvh !important;
   }
 }
+    /* Back to top */
+.to-top{
+  position: fixed;
+  right: clamp(12px, 3vw, 24px);
+  bottom: clamp(12px, 3vw, 24px);
+  width: 48px; height: 48px;
+  border: 0; border-radius: 999px;
+  display: grid; place-items: center;
+  background: var(--fg);  /* czarne */
+  color: var(--bg);       /* jasne */
+  font-family: "Archivo Black", system-ui, sans-serif;
+  font-size: 22px; line-height: 1;
+  box-shadow: 0 8px 18px rgba(0,0,0,.15);
+  opacity: 0; transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity .25s ease, transform .25s ease;
+  z-index: 45; /* lightbox ma 50, więc jest nad nim */
+}
+.to-top.show{ opacity: 1; transform: none; pointer-events: auto; }
+.to-top:hover{ filter: brightness(1.05); }
+.to-top:focus-visible{ outline: 3px solid #000; outline-offset: 3px; }
+
+@media (max-width: 640px){
+  .to-top{ width: 56px; height: 56px; font-size: 24px; }
+}
+
   </style>
 </head>
 <body>
@@ -372,5 +398,30 @@
       }, 80);
     });
   </script>
+  <button id="toTop" class="to-top" aria-label="Back to top" title="Back to top">↑</button>
+  <script>
+(() => {
+  const btn = document.getElementById('toTop');
+  if (!btn) return;
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let lastY = window.scrollY;
+
+  function onScroll(){
+    const y = window.scrollY;
+    const downFar = y > 600;                // pokaż po 600px
+    const scrollingUp = y < lastY - 10;     // albo gdy zaczynasz wracać do góry
+    btn.classList.toggle('show', downFar || scrollingUp);
+    lastY = y;
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+  });
+})();
+</script>
 </body>
 </html>
