@@ -1,8 +1,76 @@
-<!doctype html><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-<title>Contact — malepszym</title>
-<div style="max-width:900px;margin:40px auto;font-family:Inter,system-ui,Arial">
-  <a href="/" style="text-decoration:none;font-family:'Archivo Black',system-ui;color:#111">← malepszym</a>
-  <h1 style="font-family:'Archivo Black',system-ui">Contact me</h1>
-  <p>E-mail: <a href="mailto:martyna.malepszy@gmail.com">martyna.malepszy@gmail.com</a></p>
-</div>
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Contact — malepszym</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#eee;        /* tło */
+      --fg:#111;        /* kolor tekstu */
+      --muted:#bfbfbf;  /* szary dla drobnych elementów */
+      --underline:3px;  /* grubość podkreślenia */
+      --offset:6px;     /* odległość linii od tekstu */
+      --maxw:900px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--fg);
+      font-family: Inter, system-ui, Arial, sans-serif; line-height:1.6;
+      display:flex; min-height:100vh; flex-direction:column;
+    }
+    .container{max-width:var(--maxw); margin:0 auto; padding:clamp(16px,3vw,32px); width:100%}
+    .top{display:flex; align-items:center; justify-content:space-between; gap:16px}
+    .brand{
+      text-decoration:none; color:inherit;
+      font-family:"Archivo Black", system-ui, sans-serif; font-size:22px;
+    }
+    .muted{color:var(--muted); font-size:14px}
+    .title{
+      font-family:"Archivo Black", system-ui, sans-serif;
+      font-size:clamp(32px,5vw,56px); line-height:1.1; margin:24px 0 12px;
+    }
+
+    /* lista CTA */
+    .cta-list{display:grid; gap:16px; margin-top:8px}
+    .cta{
+      position:relative; display:inline-block;
+      font-family:"Archivo Black", system-ui, sans-serif;
+      font-size:clamp(32px,5vw,48px);
+      text-decoration:none; color:inherit; outline:0;
+    }
+    /* hover underline */
+    .cta::after{
+      content:""; position:absolute; left:0; bottom:calc(var(--offset) * -1);
+      width:0; height:var(--underline); background:currentColor; transition:width .25s ease;
+    }
+    .cta:hover::after{ width:100% }
+    .cta:focus-visible{ outline:3px solid #000; outline-offset:6px; border-radius:6px }
+
+    footer{margin-top:auto; border-top:1px solid #e5e5e5}
+    footer .container{ color:var(--muted); font-size:14px }
+  </style>
+</head>
+<body>
+  <header class="container top">
+    <a class="brand" href="/">malepszym</a>
+    <span class="muted">contact</span>
+  </header>
+
+  <main class="container">
+    <h1 class="title">Get in touch</h1>
+    <div class="cta-list">
+      <a class="cta" href="mailto:martyna.malepszy@gmail.com" aria-label="Wyślij do mnie maila">Mail me</a>
+      <a class="cta" href="https://www.linkedin.com/in/martyna-malepszy-616598207/" target="_blank" rel="noopener noreferrer" aria-label="Otwórz mój profil na LinkedIn">LinkedIn</a>
+      <a class="cta" href="https://ig.me/m/malepszym" target="_blank" rel="noopener noreferrer" aria-label="Napisz do mnie na Instagramie">DM Me</a>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">© <span id="y"></span> malepszym</div>
+  </footer>
+  <script>document.getElementById('y').textContent = new
