@@ -17,58 +17,84 @@
     body{
       margin:0; background:var(--bg); color:var(--fg);
       font-family:Inter,system-ui,Arial,sans-serif;
-      min-height:100vh; display:flex; flex-direction:column;
-      line-height:1.6;
+      min-height:100vh; display:flex; flex-direction:column; line-height:1.6;
     }
     .container{max-width:var(--maxw); margin:0 auto; padding:clamp(16px,3vw,32px); width:100%}
 
-    /* górny pasek */
+    /* top bar */
     .top{display:flex; align-items:center; justify-content:space-between}
-    .back{
-      display:inline-flex; align-items:center; gap:12px;
-      text-decoration:none; color:inherit;
-      font-family:"Archivo Black",system-ui,sans-serif; font-size:22px;
-    }
+    .back{display:inline-flex; align-items:center; gap:12px; text-decoration:none; color:inherit;
+      font-family:"Archivo Black",system-ui,sans-serif; font-size:22px;}
     .arrow{font-size:28px; line-height:1; transform:translateY(-1px); transition:transform .2s ease}
     .back:hover .arrow{ transform:translate(-2px,-1px) }
     .section-label{color:var(--muted); font-weight:700; text-transform:lowercase}
 
-    /* tytuł */
-    .title{
+    /* page title */
+    .page-title{
       font-family:"Archivo Black",system-ui,sans-serif;
-      text-align:center;
-      font-size:clamp(44px,10vw,120px);
-      line-height:1.05; margin:clamp(24px,6vh,48px) 0;
-      letter-spacing:1px;
-    }
-
-    /* Galeria 3 kolumny (responsywna) */
-    .gallery{
-      display:grid; gap:var(--gap);
-      grid-template-columns:repeat(3, 1fr);
-      align-items:stretch;
-    }
-    .frame{ background:#f3f3f3 }
-    .frame img{ display:block; width:100%; height:100%; object-fit:cover }
-
-    /* Podpis pod galerią */
-    .tagline{
-      font-family:"Archivo Black",system-ui,sans-serif;
-      text-align:center;
-      font-size:clamp(20px,3.2vw,36px);
+      text-align:center; letter-spacing:1px;
+      font-size:clamp(44px,10vw,120px); line-height:1.05;
       margin:clamp(24px,6vh,48px) 0;
     }
 
-    /* Animacje wejścia (delikatne) */
-    .reveal{ opacity:0; transform:translateY(12px); animation:fade .6s ease-out both }
-    .d1{animation-delay:.10s} .d2{animation-delay:.22s} .d3{animation-delay:.34s} .d4{animation-delay:.46s}
-    @keyframes fade{ from{opacity:0; transform:translateY(12px)} to{opacity:1; transform:translateY(0)} }
-    @media (prefers-reduced-motion:reduce){ .reveal{opacity:1; transform:none; animation:none} }
+    /* gallery */
+    .gallery{
+      display:grid; gap:var(--gap); grid-template-columns:repeat(3,1fr); align-items:stretch;
+    }
+    /* clickable frame with no default button chrome */
+    .frame{
+      appearance:none; -webkit-appearance:none; border:0; padding:0;
+      background:transparent; cursor:pointer; line-height:0; display:block;
+    }
+    .frame img{
+      display:block; width:100%; height:100%; object-fit:cover;
+      transition:filter .25s ease;
+    }
+    .frame:hover img{ filter:grayscale(100%) contrast(.95) brightness(.98) }
+    .frame:focus-visible{ outline:3px solid #000; outline-offset:6px; border-radius:6px }
+
+    /* caption under gallery */
+    .tagline{
+      font-family:"Archivo Black",system-ui,sans-serif;
+      text-align:center; font-size:clamp(20px,3.2vw,36px);
+      margin:clamp(24px,6vh,48px) 0;
+    }
+
+    /* subtle entrance */
+    .reveal{opacity:0; transform:translateY(12px); animation:fade .6s ease-out both}
+    .d1{animation-delay:.08s}.d2{animation-delay:.18s}.d3{animation-delay:.28s}.d4{animation-delay:.38s}
+    @keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;animation:none}}
 
     /* RWD */
     @media (max-width:1000px){ .gallery{ grid-template-columns:repeat(2,1fr) } }
     @media (max-width:640px){ .gallery{ grid-template-columns:1fr } }
-    
+
+    /* LIGHTBOX (modal) */
+    .lightbox{
+      position:fixed; inset:0; background:rgba(0,0,0,.75);
+      display:none; align-items:center; justify-content:center; gap:8px;
+      z-index:50; padding:24px;
+    }
+    .lightbox.open{ display:flex }
+    .lb-track{
+      position:relative; width:min(1200px, 96vw); height:min(86vh, 900px);
+      overflow-x:auto; scroll-snap-type:x mandatory; display:flex; gap:0; background:#111;
+    }
+    .lb-track img{
+      flex:0 0 100%; height:100%; object-fit:contain; scroll-snap-align:center; background:#111;
+    }
+    .lb-btn{
+      appearance:none; border:0; background:rgba(255,255,255,.85); color:#111;
+      width:42px; height:42px; border-radius:999px; font-size:24px; line-height:1;
+      display:inline-grid; place-items:center; cursor:pointer;
+    }
+    .lb-btn:hover{ background:#fff }
+    .lb-close{ position:absolute; top:16px; right:16px }
+    .lb-prev, .lb-next{ align-self:center }
+    .lb-prev{ order:-1 } .lb-next{ order:2 }
+    .no-scroll{ overflow:hidden }
+
     /* Footer */
     footer{ margin-top:auto; border-top:1px solid #e5e5e5 }
     footer .container{ color:#9aa0a6; font-size:14px }
@@ -77,33 +103,108 @@
 <body>
   <header class="container top">
     <a class="back" href="/" aria-label="Wróć na stronę główną">
-      <span class="arrow">←</span>
-      <span>malepszym</span>
+      <span class="arrow">←</span><span>malepszym</span>
     </a>
     <span class="section-label">work</span>
   </header>
 
   <main class="container">
-    <h1 class="title reveal d1">PROJECTS</h1>
+    <!-- główny nagłówek strony -->
+    <h1 class="page-title reveal d1">PROJECTS</h1>
 
+    <!-- trzy obrazy -->
     <div class="gallery">
-      <div class="frame reveal d2">
-        <img src="/assets/work/1.svg" alt="Remains — look 1" loading="lazy">
-      </div>
-      <div class="frame reveal d3">
-        <img src="/assets/work/2.svg" alt="Remains — look 2" loading="lazy">
-      </div>
-      <div class="frame reveal d4">
-        <img src="/assets/work/3.svg" alt="Remains — look 3" loading="lazy">
-      </div>
+      <button class="frame reveal d2" type="button" data-index="0" aria-label="Otwórz galerię — zdjęcie 1">
+        <img src="/assets/work/1.svg" alt="Remains — zdjęcie 1" loading="lazy">
+      </button>
+      <button class="frame reveal d3" type="button" data-index="1" aria-label="Otwórz galerię — zdjęcie 2">
+        <img src="/assets/work/2.svg" alt="Remains — zdjęcie 2" loading="lazy">
+      </button>
+      <button class="frame reveal d4" type="button" data-index="2" aria-label="Otwórz galerię — zdjęcie 3">
+        <img src="/assets/work/3.svg" alt="Remains — zdjęcie 3" loading="lazy">
+      </button>
     </div>
 
+    <!-- podpis POD galerią -->
     <p class="tagline reveal d4">Remains – styling – co-creative direction</p>
   </main>
+
+  <!-- MODAL GALLERY -->
+  <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Galeria — Remains">
+    <button class="lb-btn lb-prev"  aria-label="Poprzednie">‹</button>
+    <div class="lb-track" id="lbTrack" tabindex="0">
+      <img src="/assets/work/1.svg" alt="Remains — zdjęcie 1">
+      <img src="/assets/work/2.svg" alt="Remains — zdjęcie 2">
+      <img src="/assets/work/3.svg" alt="Remains — zdjęcie 3">
+      <button class="lb-btn lb-close" id="lbClose" aria-label="Zamknij">×</button>
+    </div>
+    <button class="lb-btn lb-next"  aria-label="Następne">›</button>
+  </div>
 
   <footer>
     <div class="container">© <span id="y"></span> malepszym</div>
   </footer>
-  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+
+  <script>
+    // Rok w stopce
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Lightbox logic
+    const overlay = document.getElementById('lightbox');
+    const track   = document.getElementById('lbTrack');
+    const frames  = document.querySelectorAll('.gallery .frame');
+    const btnPrev = document.querySelector('.lb-prev');
+    const btnNext = document.querySelector('.lb-next');
+    const btnClose= document.getElementById('lbClose');
+
+    let index = 0;
+
+    function openLightbox(i=0){
+      index = i;
+      overlay.classList.add('open');
+      document.body.classList.add('no-scroll');
+      const w = track.clientWidth;
+      track.scrollTo({ left: w * index, behavior: 'instant' });
+      track.focus({ preventScroll: true });
+    }
+    function closeLightbox(){
+      overlay.classList.remove('open');
+      document.body.classList.remove('no-scroll');
+    }
+    function go(delta){
+      const count = track.querySelectorAll('img').length;
+      index = (index + delta + count) % count;
+      const w = track.clientWidth;
+      track.scrollTo({ left: w * index, behavior: 'smooth' });
+    }
+
+    frames.forEach(btn=>{
+      btn.addEventListener('click', () => openLightbox(parseInt(btn.dataset.index,10)));
+    });
+    btnPrev.addEventListener('click', ()=>go(-1));
+    btnNext.addEventListener('click', ()=>go(1));
+    btnClose.addEventListener('click', closeLightbox);
+
+    overlay.addEventListener('click', (e)=>{
+      if(e.target === overlay) closeLightbox();
+    });
+
+    window.addEventListener('keydown', (e)=>{
+      if(!overlay.classList.contains('open')) return;
+      if(e.key === 'Escape') closeLightbox();
+      if(e.key === 'ArrowRight') go(1);
+      if(e.key === 'ArrowLeft') go(-1);
+    });
+
+    // Aktualizacja indexu przy ręcznym scrollu
+    let timer;
+    track.addEventListener('scroll', ()=>{
+      clearTimeout(timer);
+      timer = setTimeout(()=>{
+        const w = track.clientWidth;
+        index = Math.round(track.scrollLeft / w);
+      }, 80);
+    });
+  </script>
 </body>
 </html>
