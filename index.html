@@ -28,6 +28,13 @@
     @keyframes grow{from{transform:scaleY(0);opacity:0}to{transform:scaleY(1);opacity:1}}
     @media (max-width:700px){.split{grid-template-columns:1fr}.divider{height:1px;width:60%;margin:0 auto;transform-origin:left center}}
     @media (prefers-reduced-motion:reduce){.reveal,.divider{animation:none;opacity:1;transform:none}.biglink::after{transition:none}}
+  /* odsunięcie prawego linku od środkowej linii */
+.push-right { margin-left: clamp(12px, 3vw, 48px); }
+
+/* na mobile nie odsuwamy */
+@media (max-width:700px){
+  .push-right { margin-left: 0; }
+}
   </style>
 </head>
 <body>
@@ -42,7 +49,7 @@
   <main class="split container">
     <a class="biglink reveal d3" href="/work/">work</a>
     <div class="divider"></div>
-    <a class="biglink reveal d4" href="/contact/">contact</a>
+    <a class="biglink reveal d4 push-right" href="/contact/">contact</a>
   </main>
 </body>
 </html>
