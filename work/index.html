@@ -180,19 +180,6 @@
     height: 66dvh !important;
   }
 }
-    /* --- sticky topbar tylko na tej podstronie --- */
-.top{
-  position: sticky;
-  top: 0;
-  z-index: 40;                 /* lightbox ma 50, więc będzie nad */
-  background: var(--bg);
-  border-bottom: 1px solid #e5e5e5;
-  backdrop-filter: saturate(120%) blur(6px);
-  -webkit-backdrop-filter: saturate(120%) blur(6px);
-}
-
-/* delikatny cień po ruszeniu scrolla */
-.top.scrolled{ box-shadow: 0 6px 14px rgba(0,0,0,.05) }
   </style>
 </head>
 <body>
@@ -385,14 +372,5 @@
       }, 80);
     });
   </script>
-  <script>
-  (function(){
-    const bar = document.querySelector('.top');
-    if(!bar) return;
-    const onScroll = () => bar.classList.toggle('scrolled', window.scrollY > 4);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-  })();
-</script>
 </body>
 </html>
