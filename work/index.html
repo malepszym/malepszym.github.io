@@ -117,6 +117,32 @@
     .lb-prev{ order:-1 } .lb-next{ order:2 }
     .no-scroll{ overflow:hidden }
 
+    /* ===== Scroll reveal ===== */
+    .reveal{
+      opacity:0;
+      transform:translateY(16px);
+      transition:opacity .6s ease, transform .6s ease;
+      will-change: opacity, transform;
+    }
+    .reveal.in{ opacity:1; transform:none }
+
+    .from-left  { transform:translateX(-24px) }
+    .from-right { transform:translateX( 24px) }
+    .from-bottom{ transform:translateY( 16px) }
+
+    .reveal.in.from-left,
+    .reveal.in.from-right,
+    .reveal.in.from-bottom{ transform:none }
+
+    .delay-1{ transition-delay:.10s }
+    .delay-2{ transition-delay:.22s }
+    .delay-3{ transition-delay:.34s }
+    .delay-4{ transition-delay:.46s }
+
+    @media (prefers-reduced-motion:reduce){
+      .reveal{ opacity:1; transform:none; transition:none }
+    }
+
     /* footer */
     footer{ margin-top:auto; border-top:1px solid #e5e5e5 }
     footer .container{ color:#9aa0a6; font-size:14px }
@@ -129,22 +155,22 @@
   </header>
 
   <main class="container">
-    <h1 class="page-title">PROJECTS</h1>
+    <h1 class="page-title reveal from-bottom">PROJECTS</h1>
 
     <!-- PROJECT 1 — Remains -->
     <div class="project-block">
       <div class="gallery">
-        <button class="frame" type="button" data-group="remains" data-index="0" aria-label="Otwórz galerię — zdjęcie 1">
+        <button class="frame reveal from-left  delay-1" type="button" data-group="remains" data-index="0" aria-label="Otwórz galerię — zdjęcie 1">
           <img src="/assets/work/1.svg" alt="Remains — zdjęcie 1" loading="lazy">
         </button>
-        <button class="frame" type="button" data-group="remains" data-index="1" aria-label="Otwórz galerię — zdjęcie 2">
+        <button class="frame reveal from-bottom delay-2" type="button" data-group="remains" data-index="1" aria-label="Otwórz galerię — zdjęcie 2">
           <img src="/assets/work/2.svg" alt="Remains — zdjęcie 2" loading="lazy">
         </button>
-        <button class="frame" type="button" data-group="remains" data-index="2" aria-label="Otwórz galerię — zdjęcie 3">
+        <button class="frame reveal from-right delay-3" type="button" data-group="remains" data-index="2" aria-label="Otwórz galerię — zdjęcie 3">
           <img src="/assets/work/3.svg" alt="Remains — zdjęcie 3" loading="lazy">
         </button>
       </div>
-      <section class="project-meta">
+      <section class="project-meta reveal from-bottom delay-4">
         <h2 class="project-title">
           <a class="link-underline" href="https://www.instagram.com/remains.official" target="_blank" rel="noopener noreferrer">Remains</a>
         </h2>
@@ -155,17 +181,17 @@
     <!-- PROJECT 2 — kajamann.clothing -->
     <div class="project-block">
       <div class="gallery">
-        <button class="frame" type="button" data-group="kajamann" data-index="0" aria-label="Otwórz galerię — zdjęcie 1">
+        <button class="frame reveal from-left  delay-1" type="button" data-group="kajamann" data-index="0" aria-label="Otwórz galerię — zdjęcie 1">
           <img src="/assets/work/4.svg" alt="kajamann.clothing — zdjęcie 1" loading="lazy">
         </button>
-        <button class="frame" type="button" data-group="kajamann" data-index="1" aria-label="Otwórz galerię — zdjęcie 2">
+        <button class="frame reveal from-bottom delay-2" type="button" data-group="kajamann" data-index="1" aria-label="Otwórz galerię — zdjęcie 2">
           <img src="/assets/work/5.svg" alt="kajamann.clothing — zdjęcie 2" loading="lazy">
         </button>
-        <button class="frame" type="button" data-group="kajamann" data-index="2" aria-label="Otwórz galerię — zdjęcie 3">
+        <button class="frame reveal from-right delay-3" type="button" data-group="kajamann" data-index="2" aria-label="Otwórz galerię — zdjęcie 3">
           <img src="/assets/work/6.svg" alt="kajamann.clothing — zdjęcie 3" loading="lazy">
         </button>
       </div>
-      <section class="project-meta">
+      <section class="project-meta reveal from-bottom delay-4">
         <h2 class="project-title">
           <a class="link-underline" href="https://www.instagram.com/kajamann.clothing/" target="_blank" rel="noopener noreferrer">kajamann.clothing</a>
         </h2>
@@ -175,7 +201,7 @@
 
     <!-- PROJECT 3 — Tabusie (YouTube) -->
     <div class="project-block">
-      <div class="video-wrap">
+      <div class="video-wrap reveal from-bottom">
         <iframe
           src="https://www.youtube-nocookie.com/embed/v4vYYpS4b9Y?modestbranding=1&rel=0"
           title="Tabusie — video"
@@ -184,7 +210,7 @@
           referrerpolicy="strict-origin-when-cross-origin"
           allowfullscreen></iframe>
       </div>
-      <section class="project-meta">
+      <section class="project-meta reveal from-bottom delay-2">
         <h2 class="project-title">
           <a class="link-underline" href="http://tabou.pl/tabusie" target="_blank" rel="noopener noreferrer">Tabusie</a>
         </h2>
@@ -215,6 +241,26 @@
       kajamann: ['/assets/work/4.svg','/assets/work/5.svg','/assets/work/6.svg']
     };
 
+    /* ===== Scroll reveal (IntersectionObserver) ===== */
+    (function(){
+      const els = document.querySelectorAll('.reveal');
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(reduce){
+        els.forEach(el => el.classList.add('in'));
+        return;
+      }
+      const io = new IntersectionObserver((entries)=>{
+        entries.forEach(entry=>{
+          if(entry.isIntersecting){
+            entry.target.classList.add('in');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+      els.forEach(el => io.observe(el));
+    })();
+
+    /* ===== Lightbox ===== */
     const overlay = document.getElementById('lightbox');
     const track   = document.getElementById('lbTrack');
     const btnPrev = document.querySelector('.lb-prev');
