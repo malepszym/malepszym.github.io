@@ -11,7 +11,7 @@
     :root{
       --bg:#eee;        /* tło */
       --fg:#111;        /* kolor tekstu */
-      --muted:#bfbfbf;  /* jasny napis "contact" */
+      --muted:#bfbfbf;  /* jasny podpis */
       --underline:3px;  /* grubość podkreślenia */
       --offset:6px;     /* odległość linii od tekstu */
       --maxw:1200px;
@@ -32,7 +32,7 @@
       text-decoration:none; color:inherit; cursor:pointer;
       font-family:"Archivo Black", system-ui, sans-serif; font-size:22px;
     }
-    .arrow{font-size:28px; line-height:1; transform:translateY(-1px)}
+    .arrow{font-size:28px; line-height:1; transform:translateY(-1px); transition:transform .2s ease}
     .back:hover .arrow{transform:translate(-2px,-1px)}
     .section-label{color:var(--muted); font-weight:700; text-transform:lowercase}
 
@@ -45,10 +45,10 @@
       letter-spacing:1px;
     }
 
-    /* „chaotyczne” rozmieszczenie */
+    /* „chaotyczne” rozmieszczenie CTA */
     .scatter{
       position:relative;
-      min-height:52vh;  /* obszar do rozmieszczenia napisów */
+      min-height:52vh;
       isolation:isolate;
     }
     .cta{
@@ -67,24 +67,44 @@
     .cta:hover::after{ width:100% }
     .cta:focus-visible{ outline:3px solid #000; outline-offset:6px; border-radius:6px }
 
-    /* Konkretne pozycje (dopasuj procenty, jeśli chcesz) */
-    #cta-mail { left:12%;  top:18%; }   /* lewo-środek */
-    #cta-dm   { right:10%; top:44%; }   /* prawo-środek */
-    #cta-li   { left:22%;  bottom:6%; } /* dół-lewo  */
+    /* Konkretne pozycje (dopasuj procenty pod swój układ) */
+    #cta-mail { left:12%;  top:18%; }   /* lewo-wyżej */
+    #cta-dm   { right:10%; top:46%; }   /* prawo-środek */
+    #cta-li   { left:24%;  bottom:6%; } /* dół-lewo  */
 
-    footer{margin-top:auto; border-top:1px solid #e5e5e5}
-    footer .container{ color:#9aa0a6; font-size:14px }
-    
+    /* Animacje wejścia */
+    .anim{ opacity:0; will-change: transform, opacity; }
+    @keyframes slideFromLeft  { from{opacity:0; transform:translateX(-28px)} to{opacity:1; transform:translateX(0)} }
+    @keyframes slideFromRight { from{opacity:0; transform:translateX( 28px)} to{opacity:1; transform:translateX(0)} }
+    @keyframes slideFromTop   { from{opacity:0; transform:translateY(-16px)} to{opacity:1; transform:translateY(0)} }
+
+    .slide-left  { animation: slideFromLeft  .55s cubic-bezier(.2,.7,.2,1) both; }
+    .slide-right { animation: slideFromRight .55s cubic-bezier(.2,.7,.2,1) both; }
+    .slide-down  { animation: slideFromTop   .55s cubic-bezier(.2,.7,.2,1) both; }
+
+    /* Delaye (stagger) */
+    .delay-1 { animation-delay: .10s }
+    .delay-2 { animation-delay: .22s }
+    .delay-3 { animation-delay: .34s }
+    .delay-4 { animation-delay: .46s }
+
     /* Mobile: układ pod sobą */
     @media (max-width: 720px){
       .scatter{ min-height:0; display:grid; gap:24px; justify-items:center; }
       .cta{ position:static; }
     }
+
     /* Preferencje dostępności: bez animacji */
     @media (prefers-reduced-motion: reduce){
+      .anim{opacity:1}
+      .slide-left, .slide-right, .slide-down { animation: none }
       .cta::after{ transition:none }
       .back:hover .arrow{ transform:none }
     }
+
+    /* Footer */
+    footer{margin-top:auto; border-top:1px solid #e5e5e5}
+    footer .container{ color:#9aa0a6; font-size:14px }
   </style>
 </head>
 <body>
@@ -97,12 +117,19 @@
   </header>
 
   <main class="container">
-    <h1 class="title">GET IN TOUCH</h1>
+    <h1 class="title anim slide-down delay-1">GET IN TOUCH</h1>
 
     <div class="scatter" aria-label="Sposoby kontaktu">
-      <a id="cta-mail" class="cta" href="mailto:martyna.malepszy@gmail.com" aria-label="Wyślij do mnie maila">mail me</a>
-      <a id="cta-dm" class="cta" href="https://ig.me/m/malepszym" target="_blank" rel="noopener noreferrer" aria-label="Napisz do mnie na Instagramie">DM me</a>
-      <a id="cta-li" class="cta" href="https://www.linkedin.com/in/martyna-malepszy-616598207/" target="_blank" rel="noopener noreferrer" aria-label="Otwórz mój profil na LinkedIn">linkedin</a>
+      <a id="cta-mail" class="cta anim slide-left delay-2"
+         href="mailto:martyna.malepszy@gmail.com" aria-label="Wyślij do mnie maila">mail me</a>
+
+      <a id="cta-dm" class="cta anim slide-right delay-3"
+         href="https://ig.me/m/malepszym" target="_blank" rel="noopener noreferrer"
+         aria-label="Napisz do mnie na Instagramie">DM me</a>
+
+      <a id="cta-li" class="cta anim slide-left delay-4"
+         href="https://www.linkedin.com/in/martyna-malepszy-616598207/" target="_blank" rel="noopener noreferrer"
+         aria-label="Otwórz mój profil na LinkedIn">linkedin</a>
     </div>
   </main>
 
