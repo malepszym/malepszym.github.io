@@ -2,47 +2,204 @@
 <html lang="pl">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>malepszym — portfolio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Work — malepszym</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#eee;--fg:#111;--muted:#bfbfbf;--underline:3px;--offset:6px;--maxw:1200px}
-    *{box-sizing:border-box}html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--fg);font-family:Inter,system-ui,Arial,sans-serif;line-height:1.5}
-    .container{max-width:var(--maxw);margin:0 auto;padding:clamp(16px,3vw,32px)}
-    .masthead{text-align:center;padding-top:clamp(20px,6vh,48px)}
-    .title{font-family:"Archivo Black",system-ui,sans-serif;font-size:clamp(48px,9vw,120px);line-height:1.05;margin:0}
-    .sub{display:flex;justify-content:space-between;color:#bfbfbf;font-weight:700;text-transform:lowercase;letter-spacing:.3px;margin-top:6px}
-    .split{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:28px;padding:clamp(24px,10vh,80px) 0}
-    .biglink{position:relative;justify-self:center;font-family:"Archivo Black",system-ui,sans-serif;font-size:clamp(56px,10vw,140px);text-decoration:none;color:inherit}
-    .divider{width:1px;height:60vh;max-height:520px;background:#bfbfbf;opacity:.85;transform-origin:center top;animation:grow .7s ease-out both}
-    /* hover underline */
-    .biglink::after{content:"";position:absolute;left:0;bottom:calc(var(--offset)*-1);width:0;height:var(--underline);background:currentColor;transition:width .25s ease}
-    .biglink:hover::after{width:100%}
-    /* entrance */
-    .reveal{opacity:0;transform:translateY(8px);animation:fade .55s ease-out both}
-    .d1{animation-delay:.08s}.d2{animation-delay:.18s}.d3{animation-delay:.32s}.d4{animation-delay:.45s}
-    @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes grow{from{transform:scaleY(0);opacity:0}to{transform:scaleY(1);opacity:1}}
-    @media (max-width:700px){.split{grid-template-columns:1fr}.divider{height:1px;width:60%;margin:0 auto;transform-origin:left center}}
-    @media (prefers-reduced-motion:reduce){.reveal,.divider{animation:none;opacity:1;transform:none}.biglink::after{transition:none}}
+    :root{
+      --bg:#eeeeee; --fg:#111111; --muted:#bfbfbf;
+      --maxw:1200px; --gap:28px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--fg);
+      font-family:Inter,system-ui,Arial,sans-serif;
+      min-height:100vh; display:flex; flex-direction:column; line-height:1.6;
+    }
+    .container{max-width:var(--maxw); margin:0 auto; padding:clamp(16px,3vw,32px); width:100%}
+
+    /* top bar */
+    .top{display:flex; align-items:center; justify-content:space-between}
+    .back{display:inline-flex; align-items:center; gap:12px; text-decoration:none; color:inherit;
+      font-family:"Archivo Black",system-ui,sans-serif; font-size:22px;}
+    .arrow{font-size:28px; line-height:1; transform:translateY(-1px); transition:transform .2s ease}
+    .back:hover .arrow{ transform:translate(-2px,-1px) }
+    .section-label{color:var(--muted); font-weight:700; text-transform:lowercase}
+
+    /* project header */
+    .project-name{
+      font-family:"Archivo Black",system-ui,sans-serif;
+      text-align:center; letter-spacing:1px;
+      font-size:clamp(44px,10vw,112px); line-height:1.05;
+      margin:clamp(24px,6vh,36px) 0 8px;
+    }
+    .project-role{
+      text-align:center; font-family:"Archivo Black",system-ui,sans-serif;
+      font-size:clamp(18px,2.8vw,28px); margin:0 0 clamp(20px,6vh,36px);
+    }
+
+    /* gallery */
+    .gallery{
+      display:grid; gap:var(--gap); grid-template-columns:repeat(3,1fr); align-items:stretch;
+    }
+    .frame{ background:#f3f3f3; cursor:pointer }
+    .frame img{
+      display:block; width:100%; height:100%; object-fit:cover;
+      transition:filter .25s ease;
+    }
+    .frame:hover img{ filter:grayscale(100%) contrast(0.95) }
+
+    /* footer */
+    footer{ margin-top:auto; border-top:1px solid #e5e5e5 }
+    footer .container{ color:#9aa0a6; font-size:14px }
+
+    /* entrance (subtelne) */
+    .reveal{opacity:0; transform:translateY(12px); animation:fade .6s ease-out both}
+    .d1{animation-delay:.08s}.d2{.18s}.d3{.28s}.d4{.38s}
+    @keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;animation:none}}
+
+    /* RWD */
+    @media (max-width:1000px){ .gallery{ grid-template-columns:repeat(2,1fr) } }
+    @media (max-width:640px){ .gallery{ grid-template-columns:1fr } }
+
+    /* LIGHTBOX (modal) */
+    .lightbox{
+      position:fixed; inset:0; background:rgba(0,0,0,.75);
+      display:none; align-items:center; justify-content:center; gap:8px;
+      z-index:50; padding:24px;
+    }
+    .lightbox.open{ display:flex }
+    .lb-track{
+      position:relative; width:min(1200px, 96vw); height:min(86vh, 900px);
+      overflow-x:auto; scroll-snap-type:x mandatory; display:flex; gap:0; background:#111;
+    }
+    .lb-track img{
+      flex:0 0 100%; height:100%; object-fit:contain; scroll-snap-align:center; background:#111;
+    }
+    .lb-btn{
+      appearance:none; border:0; background:rgba(255,255,255,.85); color:#111;
+      width:42px; height:42px; border-radius:999px; font-size:24px; line-height:1;
+      display:inline-grid; place-items:center; cursor:pointer;
+    }
+    .lb-btn:hover{ background:#fff }
+    .lb-close{ position:absolute; top:16px; right:16px }
+    .lb-prev, .lb-next{ align-self:center }
+    .lb-prev{ order:-1 } .lb-next{ order:2 }
+    .no-scroll{ overflow:hidden }
+
+    @media (max-width:640px){
+      .lb-btn{ width:38px; height:38px; font-size:22px }
+    }
   </style>
 </head>
 <body>
-  <header class="masthead container">
-    <h1 class="title reveal d1">malepszym</h1>
-    <div class="sub">
-      <span class="reveal d2">martyna malepszy</span>
-      <span class="reveal d2">(she/her)</span>
-    </div>
+  <header class="container top">
+    <a class="back" href="/" aria-label="Wróć na stronę główną">
+      <span class="arrow">←</span><span>malepszym</span>
+    </a>
+    <span class="section-label">work</span>
   </header>
 
-  <main class="split container">
-    <a class="biglink reveal d3" href="/work/">work</a>
-    <div class="divider"></div>
-    <a class="biglink reveal d4" href="/contact/">contact</a>
+  <main class="container">
+    <h1 class="project-name reveal d1">Remains</h1>
+    <p class="project-role reveal d2">styling · co-creative direction</p>
+
+    <div class="gallery">
+      <button class="frame reveal d2" data-index="0" aria-label="Otwórz galerię — zdjęcie 1">
+        <img src="/assets/work/1.svg" alt="Remains — zdjęcie 1" loading="lazy">
+      </button>
+      <button class="frame reveal d3" data-index="1" aria-label="Otwórz galerię — zdjęcie 2">
+        <img src="/assets/work/2.svg" alt="Remains — zdjęcie 2" loading="lazy">
+      </button>
+      <button class="frame reveal d4" data-index="2" aria-label="Otwórz galerię — zdjęcie 3">
+        <img src="/assets/work/3.svg" alt="Remains — zdjęcie 3" loading="lazy">
+      </button>
+    </div>
   </main>
+
+  <!-- MODAL GALLERY -->
+  <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Galeria — Remains">
+    <button class="lb-btn lb-prev"  aria-label="Poprzednie">‹</button>
+    <div class="lb-track" id="lbTrack" tabindex="0">
+      <img src="/assets/work/1.svg" alt="Remains — zdjęcie 1">
+      <img src="/assets/work/2.svg" alt="Remains — zdjęcie 2">
+      <img src="/assets/work/3.svg" alt="Remains — zdjęcie 3">
+      <button class="lb-btn lb-close" id="lbClose" aria-label="Zamknij">×</button>
+    </div>
+    <button class="lb-btn lb-next"  aria-label="Następne">›</button>
+  </div>
+
+  <footer>
+    <div class="container">© <span id="y"></span> malepszym</div>
+  </footer>
+
+  <script>
+    // Rok w stopce
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Lightbox logic
+    const overlay = document.getElementById('lightbox');
+    const track   = document.getElementById('lbTrack');
+    const frames  = document.querySelectorAll('.gallery .frame');
+    const btnPrev = document.querySelector('.lb-prev');
+    const btnNext = document.querySelector('.lb-next');
+    const btnClose= document.getElementById('lbClose');
+
+    let index = 0;
+
+    function openLightbox(i=0){
+      index = i;
+      overlay.classList.add('open');
+      document.body.classList.add('no-scroll');
+      // scroll to selected image
+      const w = track.clientWidth;
+      track.scrollTo({ left: w * index, behavior: 'instant' });
+      track.focus({ preventScroll: true });
+    }
+    function closeLightbox(){
+      overlay.classList.remove('open');
+      document.body.classList.remove('no-scroll');
+    }
+    function go(delta){
+      const count = track.querySelectorAll('img').length;
+      index = (index + delta + count) % count;
+      const w = track.clientWidth;
+      track.scrollTo({ left: w * index, behavior: 'smooth' });
+    }
+
+    frames.forEach(btn=>{
+      btn.addEventListener('click', () => openLightbox(parseInt(btn.dataset.index,10)));
+    });
+    btnPrev.addEventListener('click', ()=>go(-1));
+    btnNext.addEventListener('click', ()=>go(1));
+    btnClose.addEventListener('click', closeLightbox);
+
+    // Zamknij klikając tło (poza obrazem)
+    overlay.addEventListener('click', (e)=>{
+      if(e.target === overlay) closeLightbox();
+    });
+
+    // Klawiatura
+    window.addEventListener('keydown', (e)=>{
+      if(!overlay.classList.contains('open')) return;
+      if(e.key === 'Escape') closeLightbox();
+      if(e.key === 'ArrowRight') go(1);
+      if(e.key === 'ArrowLeft') go(-1);
+    });
+
+    // Aktualizuj index przy manualnym przewijaniu
+    let timer;
+    track.addEventListener('scroll', ()=>{
+      clearTimeout(timer);
+      timer = setTimeout(()=>{
+        const w = track.clientWidth;
+        index = Math.round(track.scrollLeft / w);
+      }, 80);
+    });
+  </script>
 </body>
 </html>
