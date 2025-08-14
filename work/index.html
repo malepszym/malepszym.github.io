@@ -43,11 +43,19 @@
       grid-template-columns:repeat(3,1fr);
       align-items:stretch;
     }
+
+    /* klikane kafelki jako buttony – bez domyślnych ramek */
+    .frame{
+      appearance:none; -webkit-appearance:none;
+      border:0; padding:0; margin:0;
+      background:transparent; line-height:0; cursor:pointer; display:block;
+    }
     .frame img{
       display:block; width:100%; height:100%; object-fit:cover;
       transition:filter .25s ease;
     }
     .frame:hover img{ filter:grayscale(100%) contrast(.95) brightness(.98) }
+    .frame:focus-visible{ outline:3px solid #000; outline-offset:6px; border-radius:6px }
 
     /* meta pod galerią */
     .project-meta{ text-align:center; margin:clamp(24px,6vh,48px) 0 }
@@ -75,6 +83,31 @@
     @media (max-width:1000px){ .gallery{ grid-template-columns:repeat(2,1fr) } }
     @media (max-width:640px){ .gallery{ grid-template-columns:1fr } }
 
+    /* LIGHTBOX (modal) */
+    .lightbox{
+      position:fixed; inset:0; z-index:50;
+      display:none; align-items:center; justify-content:center; gap:8px;
+      background:rgba(0,0,0,.75); padding:24px;
+    }
+    .lightbox.open{ display:flex }
+    .lb-track{
+      position:relative; width:min(1200px, 96vw); height:min(86vh, 900px);
+      overflow-x:auto; scroll-snap-type:x mandatory; display:flex; gap:0; background:#111;
+    }
+    .lb-track img{
+      flex:0 0 100%; height:100%; object-fit:contain; scroll-snap-align:center; background:#111;
+    }
+    .lb-btn{
+      appearance:none; border:0; background:rgba(255,255,255,.85); color:#111;
+      width:42px; height:42px; border-radius:999px; font-size:24px; line-height:1;
+      display:inline-grid; place-items:center; cursor:pointer;
+    }
+    .lb-btn:hover{ background:#fff }
+    .lb-close{ position:absolute; top:16px; right:16px }
+    .lb-prev, .lb-next{ align-self:center }
+    .lb-prev{ order:-1 } .lb-next{ order:2 }
+    .no-scroll{ overflow:hidden }
+
     /* footer */
     footer{ margin-top:auto; border-top:1px solid #e5e5e5 }
     footer .container{ color:#9aa0a6; font-size:14px }
@@ -92,9 +125,15 @@
     <!-- PROJECT 1 — Remains -->
     <div class="project-block">
       <div class="gallery">
-        <div class="frame"><img src="/assets/work/1.svg" alt="Remains — zdjęcie 1" loading="lazy"></div>
-        <div class="frame"><img src="/assets/work/2.svg" alt="Remains — zdjęcie 2" loading="lazy"></div>
-        <div class="frame"><img src="/assets/work/3.svg" alt="Remains — zdjęcie 3" loading="lazy"></div>
+        <button class="frame" type="button" data-group="remains" data-index="0" aria-label="Otwórz galerię — zdjęcie 1">
+          <img src="/assets/work/1.svg" alt="Remains — zdjęcie 1" loading="lazy">
+        </button>
+        <button class="frame" type="button" data-group="remains" data-index="1" aria-label="Otwórz galerię — zdjęcie 2">
+          <img src="/assets/work/2.svg" alt="Remains — zdjęcie 2" loading="lazy">
+        </button>
+        <button class="frame" type="button" data-group="remains" data-index="2" aria-label="Otwórz galerię — zdjęcie 3">
+          <img src="/assets/work/3.svg" alt="Remains — zdjęcie 3" loading="lazy">
+        </button>
       </div>
       <section class="project-meta">
         <h2 class="project-title">
@@ -104,16 +143,140 @@
       </section>
     </div>
 
-    <!-- PROJECT 2 — kajamann.clothing (obrazy w /assets/work/) -->
+    <!-- PROJECT 2 — kajamann.clothing -->
     <div class="project-block">
       <div class="gallery">
-        <div class="frame"><img src="/assets/work/4.svg" alt="kajamann.clothing — zdjęcie 1" loading="lazy"></div>
-        <div class="frame"><img src="/assets/work/5.svg" alt="kajamann.clothing — zdjęcie 2" loading="lazy"></div>
-        <div class="frame"><img src="/assets/work/6.svg" alt="kajamann.clothing — zdjęcie 3" loading="lazy"></div>
+        <button class="frame" type="button" data-group="kajamann" data-index="0" aria-label="Otwórz galerię — zdjęcie 1">
+          <img src="/assets/work/4.svg" alt="kajamann.clothing — zdjęcie 1" loading="lazy">
+        </button>
+        <button class="frame" type="button" data-group="kajamann" data-index="1" aria-label="Otwórz galerię — zdjęcie 2">
+          <img src="/assets/work/5.svg" alt="kajamann.clothing — zdjęcie 2" loading="lazy">
+        </button>
+        <button class="frame" type="button" data-group="kajamann" data-index="2" aria-label="Otwórz galerię — zdjęcie 3">
+          <img src="/assets/work/6.svg" alt="kajamann.clothing — zdjęcie 3" loading="lazy">
+        </button>
       </div>
       <section class="project-meta">
         <h2 class="project-title">
           <a class="link-underline" href="https://www.instagram.com/kajamann.clothing/" target="_blank" rel="noopener noreferrer">kajamann.clothing</a>
         </h2>
         <p class="project-roles">styling · creative assistant</p>
-      </sect
+      </section>
+    </div>
+  </main>
+
+  <!-- MODAL GALLERY (wspólna dla obu projektów) -->
+  <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Galeria">
+    <button class="lb-btn lb-prev"  aria-label="Poprzednie">‹</button>
+    <div class="lb-track" id="lbTrack" tabindex="0"></div>
+    <button class="lb-btn lb-next"  aria-label="Następne">›</button>
+    <button class="lb-btn lb-close" id="lbClose" aria-label="Zamknij">×</button>
+  </div>
+
+  <footer>
+    <div class="container">© <span id="y"></span> malepszym</div>
+  </footer>
+
+  <script>
+    // Rok w stopce
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Mapy obrazów dla każdej galerii
+    const IMAGES = {
+      remains: [
+        '/assets/work/1.svg',
+        '/assets/work/2.svg',
+        '/assets/work/3.svg',
+      ],
+      kajamann: [
+        '/assets/work/4.svg',
+        '/assets/work/5.svg',
+        '/assets/work/6.svg',
+      ]
+    };
+
+    const overlay = document.getElementById('lightbox');
+    const track   = document.getElementById('lbTrack');
+    const btnPrev = document.querySelector('.lb-prev');
+    const btnNext = document.querySelector('.lb-next');
+    const btnClose= document.getElementById('lbClose');
+
+    let group = null;   // 'remains' | 'kajamann'
+    let index = 0;
+
+    function renderTrack(list){
+      track.innerHTML = '';
+      list.forEach((src,i)=>{
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = `Zdjęcie ${i+1}`;
+        track.appendChild(img);
+      });
+    }
+
+    function openLightbox(g, i=0){
+      group = g; index = i;
+      renderTrack(IMAGES[group]);
+      overlay.classList.add('open');
+      document.body.classList.add('no-scroll');
+      // przewiń na startowe zdjęcie
+      requestAnimationFrame(()=>{
+        const w = track.clientWidth;
+        track.scrollTo({ left: w * index, behavior: 'instant' });
+        track.focus({ preventScroll: true });
+      });
+    }
+
+    function closeLightbox(){
+      overlay.classList.remove('open');
+      document.body.classList.remove('no-scroll');
+      group = null;
+    }
+
+    function go(delta){
+      if(!group) return;
+      const count = IMAGES[group].length;
+      index = (index + delta + count) % count;
+      const w = track.clientWidth;
+      track.scrollTo({ left: w * index, behavior: 'smooth' });
+    }
+
+    // Klik na miniaturach
+    document.querySelectorAll('.frame').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const g = btn.dataset.group;
+        const i = parseInt(btn.dataset.index,10) || 0;
+        openLightbox(g, i);
+      });
+    });
+
+    // Sterowanie
+    btnPrev.addEventListener('click', ()=>go(-1));
+    btnNext.addEventListener('click', ()=>go(1));
+    btnClose.addEventListener('click', closeLightbox);
+
+    // Zamknięcie klikając tło
+    overlay.addEventListener('click', (e)=>{
+      if(e.target === overlay) closeLightbox();
+    });
+
+    // Klawiatura
+    window.addEventListener('keydown', (e)=>{
+      if(!overlay.classList.contains('open')) return;
+      if(e.key === 'Escape')      closeLightbox();
+      if(e.key === 'ArrowRight')  go(1);
+      if(e.key === 'ArrowLeft')   go(-1);
+    });
+
+    // Aktualizacja indexu przy ręcznym scrollu
+    let timer;
+    track.addEventListener('scroll', ()=>{
+      clearTimeout(timer);
+      timer = setTimeout(()=>{
+        const w = track.clientWidth;
+        index = Math.round(track.scrollLeft / w);
+      }, 80);
+    });
+  </script>
+</body>
+</html>
