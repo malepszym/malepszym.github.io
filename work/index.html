@@ -180,6 +180,32 @@
     height: 66dvh !important;
   }
 }
+    /* sticky, pełna szerokość, bez cienia/ramki */
+.top{
+  position: sticky;
+  top: 0;
+  z-index: 40;            /* lightbox ma 50, więc będzie pod */
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* pełnoekranowe tło za wąskim headerem */
+.top::before{
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+  width: 100vw;          /* szerokość całego okna */
+  height: 100%;
+  background: var(--bg); /* ten sam kolor co strona */
+  pointer-events: none;  /* nie łapie klików */
+  box-shadow: inset 0 -1px 0 #e5e5e5;
+}
+
   </style>
 </head>
 <body>
