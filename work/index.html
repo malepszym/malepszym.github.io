@@ -1,8 +1,109 @@
-<!doctype html><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-<title>Work — malepszym</title>
-<div style="max-width:900px;margin:40px auto;font-family:Inter,system-ui,Arial">
-  <a href="/" style="text-decoration:none;font-family:'Archivo Black',system-ui;color:#111">← malepszym</a>
-  <h1 style="font-family:'Archivo Black',system-ui">Wybrane projekty</h1>
-  <p>Tu dodasz siatkę projektów.</p>
-</div>
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Work — malepszym</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#eeeeee; --fg:#111111; --muted:#bfbfbf;
+      --maxw:1200px; --gap:28px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--fg);
+      font-family:Inter,system-ui,Arial,sans-serif;
+      min-height:100vh; display:flex; flex-direction:column;
+      line-height:1.6;
+    }
+    .container{max-width:var(--maxw); margin:0 auto; padding:clamp(16px,3vw,32px); width:100%}
+
+    /* górny pasek */
+    .top{display:flex; align-items:center; justify-content:space-between}
+    .back{
+      display:inline-flex; align-items:center; gap:12px;
+      text-decoration:none; color:inherit;
+      font-family:"Archivo Black",system-ui,sans-serif; font-size:22px;
+    }
+    .arrow{font-size:28px; line-height:1; transform:translateY(-1px); transition:transform .2s ease}
+    .back:hover .arrow{ transform:translate(-2px,-1px) }
+    .section-label{color:var(--muted); font-weight:700; text-transform:lowercase}
+
+    /* tytuł */
+    .title{
+      font-family:"Archivo Black",system-ui,sans-serif;
+      text-align:center;
+      font-size:clamp(44px,10vw,120px);
+      line-height:1.05; margin:clamp(24px,6vh,48px) 0;
+      letter-spacing:1px;
+    }
+
+    /* Galeria 3 kolumny (responsywna) */
+    .gallery{
+      display:grid; gap:var(--gap);
+      grid-template-columns:repeat(3, 1fr);
+      align-items:stretch;
+    }
+    .frame{ background:#f3f3f3 }
+    .frame img{ display:block; width:100%; height:100%; object-fit:cover }
+
+    /* Podpis pod galerią */
+    .tagline{
+      font-family:"Archivo Black",system-ui,sans-serif;
+      text-align:center;
+      font-size:clamp(20px,3.2vw,36px);
+      margin:clamp(24px,6vh,48px) 0;
+    }
+
+    /* Animacje wejścia (delikatne) */
+    .reveal{ opacity:0; transform:translateY(12px); animation:fade .6s ease-out both }
+    .d1{animation-delay:.10s} .d2{animation-delay:.22s} .d3{animation-delay:.34s} .d4{animation-delay:.46s}
+    @keyframes fade{ from{opacity:0; transform:translateY(12px)} to{opacity:1; transform:translateY(0)} }
+    @media (prefers-reduced-motion:reduce){ .reveal{opacity:1; transform:none; animation:none} }
+
+    /* RWD */
+    @media (max-width:1000px){ .gallery{ grid-template-columns:repeat(2,1fr) } }
+    @media (max-width:640px){ .gallery{ grid-template-columns:1fr } }
+    
+    /* Footer */
+    footer{ margin-top:auto; border-top:1px solid #e5e5e5 }
+    footer .container{ color:#9aa0a6; font-size:14px }
+  </style>
+</head>
+<body>
+  <header class="container top">
+    <a class="back" href="/" aria-label="Wróć na stronę główną">
+      <span class="arrow">←</span>
+      <span>malepszym</span>
+    </a>
+    <span class="section-label">work</span>
+  </header>
+
+  <main class="container">
+    <h1 class="title reveal d1">PROJECTS</h1>
+
+    <div class="gallery">
+      <div class="frame reveal d2">
+        <img src="/assets/work/1.svg" alt="Remains — look 1" loading="lazy">
+      </div>
+      <div class="frame reveal d3">
+        <img src="/assets/work/2.svg" alt="Remains — look 2" loading="lazy">
+      </div>
+      <div class="frame reveal d4">
+        <img src="/assets/work/3.svg" alt="Remains — look 3" loading="lazy">
+      </div>
+    </div>
+
+    <p class="tagline reveal d4">Remains – styling – co-creative direction</p>
+  </main>
+
+  <footer>
+    <div class="container">© <span id="y"></span> malepszym</div>
+  </footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+</body>
+</html>
