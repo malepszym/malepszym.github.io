@@ -60,7 +60,7 @@
       font-size:clamp(18px,3vw,28px); margin:0;
     }
 
-    /* ładne podkreślenie linków w tytułach */
+    /* underline na tytułach-linkach */
     .link-underline{ position:relative; text-decoration:none; color:inherit }
     .link-underline::after{
       content:""; position:absolute; left:0; bottom:calc(var(--offset)*-1);
@@ -104,7 +104,7 @@
       </section>
     </div>
 
-    <!-- PROJECT 2 — kajamann.clothing (obrazy: /assets/4.svg, 5.svg, 6.svg) -->
+    <!-- PROJECT 2 — kajamann.clothing (obrazy w /assets/work/) -->
     <div class="project-block">
       <div class="gallery">
         <div class="frame"><img src="/assets/work/4.svg" alt="kajamann.clothing — zdjęcie 1" loading="lazy"></div>
@@ -116,13 +116,4 @@
           <a class="link-underline" href="https://www.instagram.com/kajamann.clothing/" target="_blank" rel="noopener noreferrer">kajamann.clothing</a>
         </h2>
         <p class="project-roles">styling · creative assistant</p>
-      </section>
-    </div>
-  </main>
-
-  <footer>
-    <div class="container">© <span id="y"></span> malepszym</div>
-  </footer>
-  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
-</body>
-</html>
+      </sect
