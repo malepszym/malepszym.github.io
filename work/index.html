@@ -2,25 +2,27 @@
 <html lang="pl">
 <head>
   <link rel="canonical" href="https://malepszym.github.io/">
-<meta name="description" content="Martyna Malepszy — styling, co-creative direction, production.">
+  <meta name="description" content="Martyna Malepszy — styling, co-creative direction, production.">
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="malepszym — portfolio">
-<meta property="og:description" content="Styling, co-creative direction, production.">
-<meta property="og:url" content="https://malepszym.github.io/">
-<meta property="og:image" content="https://malepszym.github.io/assets/og-home.jpg">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="malepszym — portfolio">
+  <meta property="og:description" content="Styling, co-creative direction, production.">
+  <meta property="og:url" content="https://malepszym.github.io/">
+  <meta property="og:image" content="https://malepszym.github.io/assets/og-home.jpg">
 
-<meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
-<meta name="theme-color" content="#eeeeee">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+  <meta name="theme-color" content="#eeeeee">
+
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Work — malepszym</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
     :root{
       --bg:#eee; --fg:#111; --muted:#bfbfbf;
@@ -42,6 +44,30 @@
       font-family:"Archivo Black",system-ui,sans-serif; font-size:22px}
     .arrow{font-size:28px; line-height:1; transform:translateY(-1px)}
     .section-label{color:var(--muted); font-weight:700; text-transform:lowercase}
+
+    /* STUCK VARIANT: ta sama strzałka przypięta */
+    .back.stuck{
+      position: fixed;
+      left: clamp(10px, 2vw, 18px);
+      top:  clamp(10px, 2vw, 18px);
+      z-index: 45; /* lightbox ma 50 */
+      display: grid; place-items: center;
+      width: 44px; height: 44px;
+      background: var(--bg); color: var(--fg);
+      border: 1px solid #e5e5e5; border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,.08);
+      padding: 0; gap: 0;
+    }
+    /* ukryj wizualnie napis "malepszym" gdy stuck (A11y zostaje) */
+    .back.stuck span:nth-of-type(2){
+      position:absolute !important; width:1px; height:1px; overflow:hidden; white-space:nowrap;
+      clip:rect(0 0 0 0); clip-path:inset(50%);
+    }
+    .back.stuck .arrow{ font-size:24px; transform:none }
+    @media (max-width:700px){
+      .back.stuck{ width:40px; height:40px }
+      .back.stuck .arrow{ font-size:22px }
+    }
 
     /* page title */
     .page-title{
@@ -160,119 +186,82 @@
     /* footer */
     footer{ margin-top:auto; border-top:1px solid #e5e5e5 }
     footer .container{ color:#9aa0a6; font-size:14px }
+
     /* --- MOBILE LIGHTBOX FIX (tylko /work) --- */
-@media (max-width: 768px){
-  .lightbox{ padding: 8px !important; }                 /* mniej marginesu */
-  .lb-btn{ width:36px; height:36px; font-size:20px }
-  .lb-close{ top:8px; right:8px }
+    @media (max-width: 768px){
+      .lightbox{ padding: 8px !important; }
+      .lb-btn{ width:36px; height:36px; font-size:20px }
+      .lb-close{ top:8px; right:8px }
+      .lightbox .lb-track{
+        width: 100vw;
+        height: 70vh !important;
+        height: 70svh !important;
+        height: 70dvh !important;
+      }
+      .lightbox .lb-track img{ width:100%; height:100%; object-fit:contain; }
+    }
+    @media (max-width: 380px){
+      .lightbox .lb-track{
+        height: 66vh !important;
+        height: 66svh !important;
+        height: 66dvh !important;
+      }
+    }
 
-  /* niższy tor, liczone bez pasków przeglądarki */
-  .lightbox .lb-track{
-    width: 100vw;
-    height: 70vh !important;   /* fallback */
-    height: 70svh !important;  /* „safe” */
-    height: 70dvh !important;  /* „dynamic” */
-  }
-
-  /* obraz zawsze w całości, w oryginalnych proporcjach */
-  .lightbox .lb-track img{
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-}
-
-/* bardzo małe ekrany */
-@media (max-width: 380px){
-  .lightbox .lb-track{
-    height: 66vh !important;
-    height: 66svh !important;
-    height: 66dvh !important;
-  }
-}
     /* Back to top */
-.to-top{
-  position: fixed;
-  right: clamp(12px, 3vw, 24px);
-  bottom: clamp(12px, 3vw, 24px);
-  width: 48px; height: 48px;
-  border: 0; border-radius: 999px;
-  display: grid; place-items: center;
-  background: var(--fg);  /* czarne */
-  color: var(--bg);       /* jasne */
-  font-family: "Archivo Black", system-ui, sans-serif;
-  font-size: 22px; line-height: 1;
-  box-shadow: 0 8px 18px rgba(0,0,0,.15);
-  opacity: 0; transform: translateY(12px);
-  pointer-events: none;
-  transition: opacity .25s ease, transform .25s ease;
-  z-index: 45; /* lightbox ma 50, więc jest nad nim */
-}
-.to-top.show{ opacity: 1; transform: none; pointer-events: auto; }
-.to-top:hover{ filter: brightness(1.05); }
-.to-top:focus-visible{ outline: 3px solid #000; outline-offset: 3px; }
+    .to-top{
+      position: fixed;
+      right: clamp(12px, 3vw, 24px);
+      bottom: clamp(12px, 3vw, 24px);
+      width: 48px; height: 48px;
+      border: 0; border-radius: 999px;
+      display: grid; place-items: center;
+      background: var(--fg); color: var(--bg);
+      font-family: "Archivo Black", system-ui, sans-serif;
+      font-size: 22px; line-height: 1;
+      box-shadow: 0 8px 18px rgba(0,0,0,.15);
+      opacity: 0; transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity .25s ease, transform .25s ease;
+      z-index: 45; /* lightbox ma 50 */
+    }
+    .to-top.show{ opacity: 1; transform: none; pointer-events: auto; }
+    .to-top:hover{ filter: brightness(1.05); }
+    .to-top:focus-visible{ outline: 3px solid #000; outline-offset: 3px; }
+    @media (max-width: 640px){ .to-top{ width: 56px; height: 56px; font-size: 24px; } }
 
-@media (max-width: 640px){
-  .to-top{ width: 56px; height: 56px; font-size: 24px; }
-}
-/* overlay "see more" na kafelkach */
-.frame{ position: relative; overflow: hidden; } /* dopinka do istniejącej reguły */
-.see-more{
-  position: absolute; inset: 0; display: grid; place-items: center;
-  color: #fff; font-family: "Archivo Black", system-ui, sans-serif;
-  font-size: clamp(16px, 2.2vw, 22px); letter-spacing: .5px;
-  text-transform: lowercase;
-  opacity: 0; transition: opacity .25s ease; pointer-events: none;
-}
-.see-more::before{ content:""; position:absolute; inset:0; background:rgba(0,0,0,.28); }
-.see-more span{ position: relative; z-index: 1; }
-.frame.has-more:hover .see-more,
-.frame.has-more:focus-visible .see-more{ opacity: 1; }
-    /* ===== Pasek miniaturek w lightboxie ===== */
-.lb-thumbs{
-  position:absolute; left:50%; transform:translateX(-50%);
-  bottom:16px;
-  display:flex; gap:10px; padding:8px 10px;
-  background:rgba(0,0,0,.35); border-radius:10px;
-  max-width:96vw; overflow-x:auto; z-index:2;
-  -webkit-overflow-scrolling: touch;
-}
-.lb-thumb{
-  appearance:none; border:0; padding:0; margin:0; cursor:pointer;
-  width:clamp(44px, 6vw, 72px); height:clamp(44px, 6vw, 72px);
-  border-radius:6px; overflow:hidden; opacity:.6; outline:2px solid transparent;
-  flex:0 0 auto; background:#000;
-}
-.lb-thumb img{ width:100%; height:100%; object-fit:cover; display:block }
-.lb-thumb.active{ opacity:1; outline-color:#fff }
+    /* overlay "see more" na kafelkach */
+    .frame{ position: relative; overflow: hidden; }
+    .see-more{
+      position: absolute; inset: 0; display: grid; place-items: center;
+      color: #fff; font-family: "Archivo Black", system-ui, sans-serif;
+      font-size: clamp(16px, 2.2vw, 22px); letter-spacing: .5px;
+      text-transform: lowercase;
+      opacity: 0; transition: opacity .25s ease; pointer-events: none;
+    }
+    .see-more::before{ content:""; position:absolute; inset:0; background:rgba(0,0,0,.28); }
+    .see-more span{ position: relative; z-index: 1; }
+    .frame.has-more:hover .see-more,
+    .frame.has-more:focus-visible .see-more{ opacity: 1; }
 
-/* Ukryj pasek miniaturek na mobile */
-@media (max-width: 900px){
-  .lb-thumbs{ display:none }
-}
-    /* ===== Floating back arrow (only arrow, not whole bar) ===== */
-.back-fab{
-  position: fixed;
-  left: clamp(10px, 2vw, 18px);
-  top:  clamp(10px, 2vw, 18px);
-  width: 44px; height: 44px;
-  display: grid; place-items: center;
-  background: var(--bg); color: var(--fg);
-  border: 1px solid #e5e5e5; border-radius: 10px;
-  box-shadow: 0 8px 16px rgba(0,0,0,.08);
-  font-family: "Archivo Black", system-ui, sans-serif;
-  font-size: 24px; line-height: 1; text-decoration: none;
-  z-index: 45;             /* lightbox ma 50 – strzałka będzie pod nim */
-  opacity: 0; transform: translateY(-6px);
-  pointer-events: none; transition: opacity .25s ease, transform .25s ease;
-}
-.back-fab.show{ opacity: 1; transform: none; pointer-events: auto; }
-.back-fab:hover{ filter: brightness(1.02); }
-.back-fab:focus-visible{ outline: 3px solid #000; outline-offset: 3px; }
-
-@media (max-width:700px){
-  .back-fab{ width: 40px; height: 40px; font-size: 22px; }
-}
+    /* Pasek miniaturek w lightboxie */
+    .lb-thumbs{
+      position:absolute; left:50%; transform:translateX(-50%);
+      bottom:16px;
+      display:flex; gap:10px; padding:8px 10px;
+      background:rgba(0,0,0,.35); border-radius:10px;
+      max-width:96vw; overflow-x:auto; z-index:2;
+      -webkit-overflow-scrolling: touch;
+    }
+    .lb-thumb{
+      appearance:none; border:0; padding:0; margin:0; cursor:pointer;
+      width:clamp(44px, 6vw, 72px); height:clamp(44px, 6vw, 72px);
+      border-radius:6px; overflow:hidden; opacity:.6; outline:2px solid transparent;
+      flex:0 0 auto; background:#000;
+    }
+    .lb-thumb img{ width:100%; height:100%; object-fit:cover; display:block }
+    .lb-thumb.active{ opacity:1; outline-color:#fff }
+    @media (max-width: 900px){ .lb-thumbs{ display:none } }
   </style>
 </head>
 <body>
@@ -346,12 +335,11 @@
     </div>
   </main>
 
-  <!-- MODAL GALLERY (wspólna dla obu galerii obrazów) -->
+  <!-- MODAL GALLERY -->
   <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Galeria">
     <button class="lb-btn lb-prev"  aria-label="Poprzednie">‹</button>
     <div class="lb-track" id="lbTrack" tabindex="0"></div>
-      <!-- Pasek miniaturek (desktop) -->
-  <div class="lb-thumbs" id="lbThumbs" aria-label="Miniatury"></div>
+    <div class="lb-thumbs" id="lbThumbs" aria-label="Miniatury"></div>
     <button class="lb-btn lb-next"  aria-label="Następne">›</button>
     <button class="lb-btn lb-close" id="lbClose" aria-label="Zamknij">×</button>
   </div>
@@ -364,32 +352,26 @@
     // Rok w stopce
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // Zestawy obrazów dla lightboxa (projekty obrazkowe)
+    // Zestawy obrazów dla lightboxa
     const IMAGES = {
-  remains: [
-    '/assets/work/1.svg','/assets/work/2.svg','/assets/work/3.svg',
-    '/assets/work/r4.svg','/assets/work/r5.svg','/assets/work/r6.svg','/assets/work/r7.svg'
-  ],
-  kajamann: [
-    '/assets/work/4.svg','/assets/work/5.svg','/assets/work/6.svg',
-    '/assets/work/km4.svg','/assets/work/km5.svg','/assets/work/km6.svg','/assets/work/km7.svg'
-  ]
-};
+      remains: [
+        '/assets/work/1.svg','/assets/work/2.svg','/assets/work/3.svg',
+        '/assets/work/r4.svg','/assets/work/r5.svg','/assets/work/r6.svg','/assets/work/r7.svg'
+      ],
+      kajamann: [
+        '/assets/work/4.svg','/assets/work/5.svg','/assets/work/6.svg',
+        '/assets/work/km4.svg','/assets/work/km5.svg','/assets/work/km6.svg','/assets/work/km7.svg'
+      ]
+    };
 
-    /* ===== Scroll reveal (IntersectionObserver) ===== */
+    /* ===== Scroll reveal ===== */
     (function(){
       const els = document.querySelectorAll('.reveal');
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if(reduce){
-        els.forEach(el => el.classList.add('in'));
-        return;
-      }
+      if(reduce){ els.forEach(el => el.classList.add('in')); return; }
       const io = new IntersectionObserver((entries)=>{
         entries.forEach(entry=>{
-          if(entry.isIntersecting){
-            entry.target.classList.add('in');
-            io.unobserve(entry.target);
-          }
+          if(entry.isIntersecting){ entry.target.classList.add('in'); io.unobserve(entry.target); }
         });
       }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
       els.forEach(el => io.observe(el));
@@ -403,58 +385,48 @@
     const btnClose= document.getElementById('lbClose');
     const thumbs  = document.getElementById('lbThumbs');
 
-
     let group = null;
     let index = 0;
 
     function renderTrack(list){
-  // wyczyść slajdy i miniatury
-  track.innerHTML = '';
-  if (thumbs) thumbs.innerHTML = '';
+      track.innerHTML = '';
+      if (thumbs) thumbs.innerHTML = '';
 
-  list.forEach((src,i)=>{
-    // slajd
-    const img = document.createElement('img');
-    img.src = src;
-    img.alt = `Zdjęcie ${i+1}`;
-    track.appendChild(img);
+      list.forEach((src,i)=>{
+        const img = document.createElement('img');
+        img.src = src; img.alt = `Zdjęcie ${i+1}`;
+        track.appendChild(img);
 
-    // miniatura
-    if (thumbs){
-      const th = document.createElement('button');
-      th.className = 'lb-thumb';
-      th.setAttribute('aria-label', `Pokaż zdjęcie ${i+1}`);
-
-      const timg = document.createElement('img');
-      timg.src = src;
-      timg.alt = '';
-      th.appendChild(timg);
-
-      th.addEventListener('click', ()=> jumpTo(i));
-      thumbs.appendChild(th);
+        if (thumbs){
+          const th = document.createElement('button');
+          th.className = 'lb-thumb';
+          th.setAttribute('aria-label', `Pokaż zdjęcie ${i+1}`);
+          const timg = document.createElement('img');
+          timg.src = src; timg.alt = '';
+          th.appendChild(timg);
+          th.addEventListener('click', ()=> jumpTo(i));
+          thumbs.appendChild(th);
+        }
+      });
     }
-  });
-}
-function updateThumbsActive(){
-  if (!thumbs) return;
-  const items = thumbs.querySelectorAll('.lb-thumb');
-  items.forEach((el, i)=> el.classList.toggle('active', i === index));
 
-  // przewiń pasek, żeby aktywna miniatura była w centrum
-  const active = items[index];
-  if (active){
-    const center = active.offsetLeft - (thumbs.clientWidth/2 - active.clientWidth/2);
-    thumbs.scrollTo({ left: Math.max(0, center), behavior: 'smooth' });
-  }
-}
+    function updateThumbsActive(){
+      if (!thumbs) return;
+      const items = thumbs.querySelectorAll('.lb-thumb');
+      items.forEach((el, i)=> el.classList.toggle('active', i === index));
+      const active = items[index];
+      if (active){
+        const center = active.offsetLeft - (thumbs.clientWidth/2 - active.clientWidth/2);
+        thumbs.scrollTo({ left: Math.max(0, center), behavior: 'smooth' });
+      }
+    }
 
-function jumpTo(i){
-  index = i;
-  const w = track.clientWidth;
-  track.scrollTo({ left: w * index, behavior: 'smooth' });
-  updateThumbsActive();
-}
-
+    function jumpTo(i){
+      index = i;
+      const w = track.clientWidth;
+      track.scrollTo({ left: w * index, behavior: 'smooth' });
+      updateThumbsActive();
+    }
 
     function openLightbox(g, i=0){
       group = g; index = i;
@@ -482,43 +454,41 @@ function jumpTo(i){
       updateThumbsActive();
     }
 
-    // Kliknięcia miniatur + automatyczny overlay "see more" gdy jest >3 zdjęć
-document.querySelectorAll('.frame').forEach(btn=>{
-  const g = btn.dataset.group;
-  const needsMore = IMAGES[g] && IMAGES[g].length > 3;
+    // Miniatury + overlay "see more"
+    document.querySelectorAll('.frame').forEach(btn=>{
+      const g = btn.dataset.group;
+      const needsMore = IMAGES[g] && IMAGES[g].length > 3;
 
-  if (needsMore) {
-    btn.classList.add('has-more');
-    if (!btn.querySelector('.see-more')) {
-      const o = document.createElement('span');
-      o.className = 'see-more';
-      o.setAttribute('aria-hidden','true');
-      const inner = document.createElement('span');
-      inner.textContent = 'see more';
-      o.appendChild(inner);
-      btn.appendChild(o);
-    }
-  }
+      if (needsMore) {
+        btn.classList.add('has-more');
+        if (!btn.querySelector('.see-more')) {
+          const o = document.createElement('span');
+          o.className = 'see-more';
+          o.setAttribute('aria-hidden','true');
+          const inner = document.createElement('span');
+          inner.textContent = 'see more';
+          o.appendChild(inner);
+          btn.appendChild(o);
+        }
+      }
 
-  btn.addEventListener('click', ()=>{
-    const i = parseInt(btn.dataset.index,10) || 0;
-    openLightbox(g, i);
-  });
-});
+      btn.addEventListener('click', ()=>{
+        const i = parseInt(btn.dataset.index,10) || 0;
+        openLightbox(g, i);
+      });
+    });
 
     // Sterowanie lightbox
     btnPrev.addEventListener('click', ()=>go(-1));
     btnNext.addEventListener('click', ()=>go(1));
     btnClose.addEventListener('click', closeLightbox);
 
-    overlay.addEventListener('click', (e)=>{
-      if(e.target === overlay) closeLightbox();
-    });
+    overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeLightbox(); });
     window.addEventListener('keydown', (e)=>{
       if(!overlay.classList.contains('open')) return;
       if(e.key === 'Escape') closeLightbox();
       if(e.key === 'ArrowRight') go(1);
-      if(e.key === 'ArrowLeft') go(-1);
+      if(e.key === 'ArrowLeft')  go(-1);
     });
 
     // Aktualizacja indexu przy ręcznym scrollu
@@ -532,45 +502,46 @@ document.querySelectorAll('.frame').forEach(btn=>{
       }, 80);
     });
   </script>
+
+  <!-- Back to top -->
   <button id="toTop" class="to-top" aria-label="Back to top" title="Back to top">↑</button>
   <script>
-(() => {
-  const btn = document.getElementById('toTop');
-  if (!btn) return;
+    (() => {
+      const btn = document.getElementById('toTop');
+      if (!btn) return;
 
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let lastY = window.scrollY;
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let lastY = window.scrollY;
 
-  function onScroll(){
-    const y = window.scrollY;
-    const downFar = y > 600;                // pokaż po 600px
-    const scrollingUp = y < lastY - 10;     // albo gdy zaczynasz wracać do góry
-    btn.classList.toggle('show', downFar || scrollingUp);
-    lastY = y;
-  }
+      function onScroll(){
+        const y = window.scrollY;
+        const downFar = y > 600;
+        const scrollingUp = y < lastY - 10;
+        btn.classList.toggle('show', downFar || scrollingUp);
+        lastY = y;
+      }
 
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
 
-  btn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
-  });
-})();
-</script>
+      btn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      });
+    })();
+  </script>
+
+  <!-- Zamrażanie istniejącej strzałki z nagłówka -->
   <script>
-(() => {
-  const fab = document.getElementById('backFab');
-  const header = document.querySelector('header');    // Twój górny pasek
-  if (!fab || !header) return;
+    (() => {
+      const header = document.querySelector('header');
+      const back   = document.querySelector('header .back');
+      if (!header || !back) return;
 
-  // Pokaż strzałkę dopiero, gdy header zniknie z widoku
-  const io = new IntersectionObserver(([entry]) => {
-    fab.classList.toggle('show', !entry.isIntersecting);
-  }, { threshold: 0 });
-  io.observe(header);
-})();
-</script>
-  <a id="backFab" class="back-fab" href="/" aria-label="Back to home" title="Back to home">←</a>
-  <a id="backFab" class="back-fab show" href="/">←</a>
+      const io = new IntersectionObserver(([entry]) => {
+        back.classList.toggle('stuck', !entry.isIntersecting);
+      }, { threshold: 0 });
+      io.observe(header);
+    })();
+  </script>
 </body>
 </html>
