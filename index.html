@@ -2,25 +2,27 @@
 <html lang="pl">
 <head>
   <link rel="canonical" href="https://malepszym.github.io/">
-<meta name="description" content="Martyna Malepszy — styling, co-creative direction, production.">
+  <meta name="description" content="Martyna Malepszy — styling, co-creative direction, production.">
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="malepszym — portfolio">
-<meta property="og:description" content="Styling, co-creative direction, production.">
-<meta property="og:url" content="https://malepszym.github.io/">
-<meta property="og:image" content="https://malepszym.github.io/assets/og-home.jpg">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="malepszym — portfolio">
+  <meta property="og:description" content="Styling, co-creative direction, production.">
+  <meta property="og:url" content="https://malepszym.github.io/">
+  <meta property="og:image" content="https://malepszym.github.io/assets/og-home.jpg">
 
-<meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
-<meta name="theme-color" content="#eeeeee">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+  <meta name="theme-color" content="#eeeeee">
+
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>malepszym — portfolio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
     :root{--bg:#eee;--fg:#111;--muted:#bfbfbf;--underline:3px;--offset:6px;--maxw:1200px}
     *{box-sizing:border-box}html,body{height:100%}
@@ -29,26 +31,46 @@
     .masthead{text-align:center;padding-top:clamp(20px,6vh,48px)}
     .title{font-family:"Archivo Black",system-ui,sans-serif;font-size:clamp(48px,9vw,120px);line-height:1.05;margin:0}
     .sub{display:flex;justify-content:space-between;color:#bfbfbf;font-weight:700;text-transform:lowercase;letter-spacing:.3px;margin-top:6px}
+
     .split{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:28px;padding:clamp(24px,10vh,80px) 0}
     .biglink{position:relative;justify-self:center;font-family:"Archivo Black",system-ui,sans-serif;font-size:clamp(56px,10vw,140px);text-decoration:none;color:inherit}
     .divider{width:1px;height:60vh;max-height:520px;background:#bfbfbf;opacity:.85;transform-origin:center top;animation:grow .7s ease-out both}
+
     /* hover underline */
     .biglink::after{content:"";position:absolute;left:0;bottom:calc(var(--offset)*-1);width:0;height:var(--underline);background:currentColor;transition:width .25s ease}
     .biglink:hover::after{width:100%}
+
     /* entrance */
     .reveal{opacity:0;transform:translateY(8px);animation:fade .55s ease-out both}
     .d1{animation-delay:.08s}.d2{animation-delay:.18s}.d3{animation-delay:.32s}.d4{animation-delay:.45s}
     @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
     @keyframes grow{from{transform:scaleY(0);opacity:0}to{transform:scaleY(1);opacity:1}}
-    @media (max-width:700px){.split{grid-template-columns:1fr}.divider{height:1px;width:60%;margin:0 auto;transform-origin:left center}}
-    @media (prefers-reduced-motion:reduce){.reveal,.divider{animation:none;opacity:1;transform:none}.biglink::after{transition:none}}
-  /* odsunięcie prawego linku od środkowej linii */
-.push-right { margin-left: clamp(12px, 3vw, 48px); }
 
-/* na mobile nie odsuwamy */
-@media (max-width:700px){
-  .push-right { margin-left: 0; }
-}
+    /* mobile layout */
+    @media (max-width:700px){
+      .split{grid-template-columns:1fr}
+      .divider{height:1px;width:60%;margin:0 auto;transform-origin:left center}
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      .reveal,.divider{animation:none;opacity:1;transform:none}
+      .biglink::after{transition:none}
+    }
+
+    /* odsunięcie prawego linku od środkowej linii */
+    .push-right { margin-left: clamp(12px, 3vw, 48px); }
+    @media (max-width:700px){ .push-right { margin-left: 0; } }
+
+    /* === DESKTOP-ONLY: zmniejsz biglink o ~35% === */
+    @media (min-width:701px){
+      .biglink{
+        font-size: clamp(
+          calc(56px * 0.65),
+          calc(10vw * 0.65),
+          calc(140px * 0.65)
+        );
+      }
+    }
   </style>
 </head>
 <body>
