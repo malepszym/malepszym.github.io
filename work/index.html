@@ -330,7 +330,25 @@
   .credits-track{ animation:none }
   .credits::before,.credits::after{ display:none }
 }
-
+/* footer layout + socials */
+footer .foot{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; flex-wrap:wrap;   /* na wąskich ekranach zawinie się elegancko */
+}
+footer .socials{
+  display:flex; align-items:center; gap:10px;
+  color:#9aa0a6; font-size:14px;   /* ten sam mały druk co lewa strona */
+}
+footer .socials a{
+  color:inherit; text-decoration:none;
+}
+footer .socials a:hover{
+  text-decoration:underline;
+}
+footer .socials .sep{ opacity:.6; user-select:none }
+@media (max-width:520px){
+  footer .foot{ justify-content:center; gap:8px }
+}
   </style>
 </head>
 <body>
