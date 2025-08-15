@@ -311,13 +311,13 @@
     <div class="project-block">
       <div class="gallery">
         <button class="frame reveal from-left  delay-1" type="button" data-group="remains" data-index="0" aria-label="Otwórz galerię — zdjęcie 1">
-          <img src="/assets/work/1.svg" alt="Remains — zdjęcie 1" loading="lazy">
+          <img src="/assets/work/1.svg" alt="Remains — zdjęcie 1" loading="eager" fetchpriority="high" class="critical">
         </button>
         <button class="frame reveal from-bottom delay-2" type="button" data-group="remains" data-index="1" aria-label="Otwórz galerię — zdjęcie 2">
-          <img src="/assets/work/2.svg" alt="Remains — zdjęcie 2" loading="lazy">
+          <img src="/assets/work/2.svg" alt="Remains — zdjęcie 2" loading="eager" fetchpriority="high" class="critical">
         </button>
         <button class="frame reveal from-right delay-3" type="button" data-group="remains" data-index="2" aria-label="Otwórz galerię — zdjęcie 3">
-          <img src="/assets/work/3.svg" alt="Remains — zdjęcie 3" loading="lazy">
+          <img src="/assets/work/3.svg" alt="Remains — zdjęcie 3" loading="eager" fetchpriority="high" class="critical">
         </button>
       </div>
       <section class="project-meta reveal from-bottom delay-4">
@@ -571,23 +571,45 @@
   const pre = document.getElementById('preloader');
   if (!pre) return;
 
-  const MIN_SHOW = 450;           // min. czas wyświetlania, żeby nie migało
-  const start = performance.now();
+  const MIN_SHOW = 450;   // min. czas pokazywania (ms)
+  const MAX_WAIT = 3500;  // górny limit czekania
 
-  const hide = () => {
+  function waitForImage(img){
+    if (img.complete && img.naturalWidth > 0){
+      return img.decode ? img.decode().catch(()=>{}) : Promise.resolve();
+    }
+    return new Promise(res => {
+      img.addEventListener('load', async () => {
+        if (img.decode){ try { await img.decode(); } catch(e){} }
+        res();
+      }, { once:true });
+      img.addEventListener('error', res, { once:true });
+    });
+  }
+
+  async function init(){
+    const start = performance.now();
+    const critical = Array.from(
+      document.querySelectorAll('img.critical, img[loading="eager"][fetchpriority="high"]')
+    );
+    const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+    const imgsReady  = Promise.allSettled(critical.map(waitForImage));
+
+    await Promise.race([
+      Promise.all([fontsReady, imgsReady]),
+      new Promise(r => setTimeout(r, MAX_WAIT))
+    ]);
+
     const elapsed = performance.now() - start;
     const wait = Math.max(0, MIN_SHOW - elapsed);
     setTimeout(() => {
       pre.classList.add('hidden');
       pre.addEventListener('transitionend', () => pre.remove(), { once:true });
-      document.documentElement.classList.add('app-ready');
     }, wait);
-  };
+  }
 
-  window.addEventListener('load', hide);  // chowamy po pełnym załadowaniu
-  setTimeout(hide, 2500);                 // fallback, gdyby load się opóźnił
+  init();
 })();
 </script>
-
 </body>
 </html>
