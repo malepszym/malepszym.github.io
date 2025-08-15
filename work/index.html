@@ -215,7 +215,19 @@
 @media (max-width: 640px){
   .to-top{ width: 56px; height: 56px; font-size: 24px; }
 }
-
+/* overlay "see more" na kafelkach */
+.frame{ position: relative; overflow: hidden; } /* dopinka do istniejącej reguły */
+.see-more{
+  position: absolute; inset: 0; display: grid; place-items: center;
+  color: #fff; font-family: "Archivo Black", system-ui, sans-serif;
+  font-size: clamp(16px, 2.2vw, 22px); letter-spacing: .5px;
+  text-transform: lowercase;
+  opacity: 0; transition: opacity .25s ease; pointer-events: none;
+}
+.see-more::before{ content:""; position:absolute; inset:0; background:rgba(0,0,0,.28); }
+.see-more span{ position: relative; z-index: 1; }
+.frame.has-more:hover .see-more,
+.frame.has-more:focus-visible .see-more{ opacity: 1; }
   </style>
 </head>
 <body>
@@ -380,14 +392,29 @@
       track.scrollTo({ left: w * index, behavior: 'smooth' });
     }
 
-    // Kliknięcia miniatur
-    document.querySelectorAll('.frame').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const g = btn.dataset.group;
-        const i = parseInt(btn.dataset.index,10) || 0;
-        openLightbox(g, i);
-      });
-    });
+    // Kliknięcia miniatur + automatyczny overlay "see more" gdy jest >3 zdjęć
+document.querySelectorAll('.frame').forEach(btn=>{
+  const g = btn.dataset.group;
+  const needsMore = IMAGES[g] && IMAGES[g].length > 3;
+
+  if (needsMore) {
+    btn.classList.add('has-more');
+    if (!btn.querySelector('.see-more')) {
+      const o = document.createElement('span');
+      o.className = 'see-more';
+      o.setAttribute('aria-hidden','true');
+      const inner = document.createElement('span');
+      inner.textContent = 'see more';
+      o.appendChild(inner);
+      btn.appendChild(o);
+    }
+  }
+
+  btn.addEventListener('click', ()=>{
+    const i = parseInt(btn.dataset.index,10) || 0;
+    openLightbox(g, i);
+  });
+});
 
     // Sterowanie lightbox
     btnPrev.addEventListener('click', ()=>go(-1));
