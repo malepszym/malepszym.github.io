@@ -56,9 +56,10 @@
 
     /* wiersz tytułu – centruje całość */
 .title-row{
-  position: relative;                          /* kotwica dla .hot-note */
-  display: inline-block;                       /* szerokość = szerokość tytułu */
-  margin: clamp(24px, 6vh, 48px) auto;         /* wyśrodkuj blok w poziomie */
+  position: relative;
+  display: block;                 /* żeby margin:auto centrował */
+  width: max-content;             /* szerokość = szerokość tytułu */
+  margin: clamp(24px, 6vh, 48px) auto;  /* wyśrodkuj poziomo */
 }
 .title-row .title{ margin: 0; text-align: center; }
 
