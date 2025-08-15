@@ -44,6 +44,32 @@
       font-family:"Archivo Black",system-ui,sans-serif; font-size:22px}
     .arrow{font-size:28px; line-height:1; transform:translateY(-1px)}
     .section-label{color:var(--muted); font-weight:700; text-transform:lowercase}
+
+    /* === STUCK: ta sama strzałka przypięta względem .container === */
+    .back.stuck{
+      position: fixed;
+      /* lewa krawędź kontenera + jego padding */
+      left: calc( max((100vw - var(--maxw)) / 2, 0px) + clamp(16px, 3vw, 32px) );
+      /* ta sama wysokość co padding kontenera */
+      top:  clamp(16px, 3vw, 32px);
+      z-index: 45; /* lightbox ma 50; zmień na 55, jeśli chcesz nad lightboxem */
+      display: grid; place-items: center;
+      width: 36px; height: 36px;         /* ← rozmiar kwadratu */
+      background: var(--bg); color: var(--fg);
+      border: 1px solid #e5e5e5; border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,.08);
+      padding: 0; gap: 0;
+    }
+    /* ukryj wizualnie napis "malepszym" w trybie stuck (A11y zostaje) */
+    .back.stuck span:nth-of-type(2){
+      position:absolute !important; width:1px; height:1px; overflow:hidden; white-space:nowrap;
+      clip:rect(0 0 0 0); clip-path:inset(50%);
+    }
+    /* strzałka zostaje jak była */
+    .back.stuck .arrow{ font-size:24px; transform:none }
+    @media (max-width:700px){
+      .back.stuck{ width:40px; height:40px }
+      .back.stuck .arrow{ font-size:22px }
     }
 
     /* page title */
@@ -66,6 +92,7 @@
       appearance:none; -webkit-appearance:none;
       border:0; padding:0; margin:0;
       background:transparent; line-height:0; cursor:pointer; display:block;
+      position:relative; overflow:hidden; /* dla overlayu */
     }
     .frame img{
       display:block; width:100%; height:100%; object-fit:cover;
@@ -134,37 +161,59 @@
     .lb-prev{ order:-1 } .lb-next{ order:2 }
     .no-scroll{ overflow:hidden }
 
+    /* overlay "see more" */
+    .see-more{
+      position:absolute; inset:0; display:grid; place-items:center;
+      color:#fff; font-family:"Archivo Black",system-ui,sans-serif;
+      font-size:clamp(16px,2.2vw,22px); letter-spacing:.5px;
+      text-transform:lowercase;
+      opacity:0; transition:opacity .25s ease; pointer-events:none;
+    }
+    .see-more::before{ content:""; position:absolute; inset:0; background:rgba(0,0,0,.28) }
+    .see-more span{ position:relative; z-index:1 }
+    .frame.has-more:hover .see-more,
+    .frame.has-more:focus-visible .see-more{ opacity:1 }
+
+    /* Pasek miniaturek w lightboxie (desktop) */
+    .lb-thumbs{
+      position:absolute; left:50%; transform:translateX(-50%);
+      bottom:16px;
+      display:flex; gap:10px; padding:8px 10px;
+      background:rgba(0,0,0,.35); border-radius:10px;
+      max-width:96vw; overflow-x:auto; z-index:2;
+      -webkit-overflow-scrolling: touch;
+    }
+    .lb-thumb{
+      appearance:none; border:0; padding:0; margin:0; cursor:pointer;
+      width:clamp(44px, 6vw, 72px); height:clamp(44px, 6vw, 72px);
+      border-radius:6px; overflow:hidden; opacity:.6; outline:2px solid transparent;
+      flex:0 0 auto; background:#000;
+    }
+    .lb-thumb img{ width:100%; height:100%; object-fit:cover; display:block }
+    .lb-thumb.active{ opacity:1; outline-color:#fff }
+    @media (max-width: 900px){ .lb-thumbs{ display:none } }
+
     /* ===== Scroll reveal ===== */
     .reveal{
-      opacity:0;
-      transform:translateY(16px);
-      transition:opacity .6s ease, transform .6s ease;
-      will-change: opacity, transform;
+      opacity:0; transform:translateY(16px);
+      transition:opacity .6s ease, transform .6s ease; will-change:opacity,transform;
     }
     .reveal.in{ opacity:1; transform:none }
-
-    .from-left  { transform:translateX(-24px) }
-    .from-right { transform:translateX( 24px) }
-    .from-bottom{ transform:translateY( 16px) }
-
-    .reveal.in.from-left,
-    .reveal.in.from-right,
-    .reveal.in.from-bottom{ transform:none }
-
+    .from-left{ transform:translateX(-24px) }
+    .from-right{ transform:translateX(24px) }
+    .from-bottom{ transform:translateY(16px) }
+    .reveal.in.from-left,.reveal.in.from-right,.reveal.in.from-bottom{ transform:none }
     .delay-1{ transition-delay:.10s }
     .delay-2{ transition-delay:.22s }
     .delay-3{ transition-delay:.34s }
     .delay-4{ transition-delay:.46s }
-
-    @media (prefers-reduced-motion:reduce){
-      .reveal{ opacity:1; transform:none; transition:none }
-    }
+    @media (prefers-reduced-motion:reduce){ .reveal{ opacity:1; transform:none; transition:none } }
 
     /* footer */
     footer{ margin-top:auto; border-top:1px solid #e5e5e5 }
     footer .container{ color:#9aa0a6; font-size:14px }
 
-    /* --- MOBILE LIGHTBOX FIX (tylko /work) --- */
+    /* --- MOBILE LIGHTBOX FIX --- */
     @media (max-width: 768px){
       .lightbox{ padding: 8px !important; }
       .lb-btn{ width:36px; height:36px; font-size:20px }
@@ -175,7 +224,7 @@
         height: 70svh !important;
         height: 70dvh !important;
       }
-      .lightbox .lb-track img{ width:100%; height:100%; object-fit:contain; }
+      .lightbox .lb-track img{ width:100%; height:100%; object-fit:contain }
     }
     @media (max-width: 380px){
       .lightbox .lb-track{
@@ -198,77 +247,13 @@
       font-size: 22px; line-height: 1;
       box-shadow: 0 8px 18px rgba(0,0,0,.15);
       opacity: 0; transform: translateY(12px);
-      pointer-events: none;
-      transition: opacity .25s ease, transform .25s ease;
+      pointer-events: none; transition: opacity .25s ease, transform .25s ease;
       z-index: 45; /* lightbox ma 50 */
     }
-    .to-top.show{ opacity: 1; transform: none; pointer-events: auto; }
-    .to-top:hover{ filter: brightness(1.05); }
-    .to-top:focus-visible{ outline: 3px solid #000; outline-offset: 3px; }
-    @media (max-width: 640px){ .to-top{ width: 56px; height: 56px; font-size: 24px; } }
-
-    /* overlay "see more" na kafelkach */
-    .frame{ position: relative; overflow: hidden; }
-    .see-more{
-      position: absolute; inset: 0; display: grid; place-items: center;
-      color: #fff; font-family: "Archivo Black", system-ui, sans-serif;
-      font-size: clamp(16px, 2.2vw, 22px); letter-spacing: .5px;
-      text-transform: lowercase;
-      opacity: 0; transition: opacity .25s ease; pointer-events: none;
-    }
-    .see-more::before{ content:""; position:absolute; inset:0; background:rgba(0,0,0,.28); }
-    .see-more span{ position: relative; z-index: 1; }
-    .frame.has-more:hover .see-more,
-    .frame.has-more:focus-visible .see-more{ opacity: 1; }
-
-    /* Pasek miniaturek w lightboxie */
-    .lb-thumbs{
-      position:absolute; left:50%; transform:translateX(-50%);
-      bottom:16px;
-      display:flex; gap:10px; padding:8px 10px;
-      background:rgba(0,0,0,.35); border-radius:10px;
-      max-width:96vw; overflow-x:auto; z-index:2;
-      -webkit-overflow-scrolling: touch;
-    }
-    .lb-thumb{
-      appearance:none; border:0; padding:0; margin:0; cursor:pointer;
-      width:clamp(44px, 6vw, 72px); height:clamp(44px, 6vw, 72px);
-      border-radius:6px; overflow:hidden; opacity:.6; outline:2px solid transparent;
-      flex:0 0 auto; background:#000;
-    }
-    .lb-thumb img{ width:100%; height:100%; object-fit:cover; display:block }
-    .lb-thumb.active{ opacity:1; outline-color:#fff }
-    @media (max-width: 900px){ .lb-thumbs{ display:none } }
-}
-    /* STUCK VARIANT — JEDYNY blok */
-.back.stuck{
-  position: fixed;
-  /* zakotwiczenie do lewej krawędzi .container */
-  left: calc( max((100vw - var(--maxw)) / 2, 0px) + clamp(16px, 3vw, 32px) );
-  top:  clamp(16px, 3vw, 32px);
-  z-index: 55;
-  display: grid; place-items: center;
-  width: 36px;   /* ← tu ustawiasz docelowy rozmiar kwadratu */
-  height: 36px;
-  background: var(--bg); color: var(--fg);
-  border: 1px solid #e5e5e5; border-radius: 10px;
-  box-shadow: 0 8px 16px rgba(0,0,0,.08);
-  padding: 0; gap: 0;
-}
-/* ukryj wizualnie napis "malepszym" gdy sticky (a11y zostaje) */
-.back.stuck span:nth-of-type(2){
-  position:absolute !important; width:1px; height:1px; overflow:hidden; white-space:nowrap;
-  clip:rect(0 0 0 0); clip-path:inset(50%);
-}
-/* strzałka zostaje jak była */
-.back.stuck .arrow{ font-size:24px; transform:none }
-
-/* MOBILE — jeśli chcesz inny rozmiar na telefonie, ustaw tu, albo usuń bloczek całkiem */
-@media (max-width:700px){
-  .back.stuck{ width:40px; height:40px; }
-  .back.stuck .arrow{ font-size:22px; }
-}
-
+    .to-top.show{ opacity:1; transform:none; pointer-events:auto }
+    .to-top:hover{ filter:brightness(1.05) }
+    .to-top:focus-visible{ outline:3px solid #000; outline-offset:3px }
+    @media (max-width:640px){ .to-top{ width:56px; height:56px; font-size:24px } }
   </style>
 </head>
 <body>
@@ -355,6 +340,9 @@
     <div class="container">© <span id="y"></span> malepszym</div>
   </footer>
 
+  <!-- Back to top -->
+  <button id="toTop" class="to-top" aria-label="Back to top" title="Back to top">↑</button>
+
   <script>
     // Rok w stopce
     document.getElementById('y').textContent = new Date().getFullYear();
@@ -398,12 +386,10 @@
     function renderTrack(list){
       track.innerHTML = '';
       if (thumbs) thumbs.innerHTML = '';
-
       list.forEach((src,i)=>{
         const img = document.createElement('img');
         img.src = src; img.alt = `Zdjęcie ${i+1}`;
         track.appendChild(img);
-
         if (thumbs){
           const th = document.createElement('button');
           th.className = 'lb-thumb';
@@ -470,8 +456,7 @@
         btn.classList.add('has-more');
         if (!btn.querySelector('.see-more')) {
           const o = document.createElement('span');
-          o.className = 'see-more';
-          o.setAttribute('aria-hidden','true');
+          o.className = 'see-more'; o.setAttribute('aria-hidden','true');
           const inner = document.createElement('span');
           inner.textContent = 'see more';
           o.appendChild(inner);
@@ -489,7 +474,6 @@
     btnPrev.addEventListener('click', ()=>go(-1));
     btnNext.addEventListener('click', ()=>go(1));
     btnClose.addEventListener('click', closeLightbox);
-
     overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeLightbox(); });
     window.addEventListener('keydown', (e)=>{
       if(!overlay.classList.contains('open')) return;
@@ -508,18 +492,13 @@
         updateThumbsActive();
       }, 80);
     });
-  </script>
 
-  <!-- Back to top -->
-  <button id="toTop" class="to-top" aria-label="Back to top" title="Back to top">↑</button>
-  <script>
-    (() => {
+    /* Back to top */
+    (function(){
       const btn = document.getElementById('toTop');
       if (!btn) return;
-
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       let lastY = window.scrollY;
-
       function onScroll(){
         const y = window.scrollY;
         const downFar = y > 600;
@@ -527,23 +506,18 @@
         btn.classList.toggle('show', downFar || scrollingUp);
         lastY = y;
       }
-
       window.addEventListener('scroll', onScroll, { passive: true });
       onScroll();
-
       btn.addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
       });
     })();
-  </script>
 
-  <!-- Zamrażanie istniejącej strzałki z nagłówka -->
-  <script>
-    (() => {
+    /* Zamrażanie istniejącej strzałki z nagłówka */
+    (function(){
       const header = document.querySelector('header');
       const back   = document.querySelector('header .back');
       if (!header || !back) return;
-
       const io = new IntersectionObserver(([entry]) => {
         back.classList.toggle('stuck', !entry.isIntersecting);
       }, { threshold: 0 });
