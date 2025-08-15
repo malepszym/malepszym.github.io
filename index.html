@@ -30,7 +30,16 @@
   <style>
     :root{--bg:#eee;--fg:#111;--muted:#bfbfbf;--underline:3px;--offset:6px;--maxw:1200px}
     *{box-sizing:border-box}html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--fg);font-family:Inter,system-ui,Arial,sans-serif;line-height:1.5}
+    body{
+  margin:0;
+  background:var(--bg);
+  color:var(--fg);
+  font-family:Inter,system-ui,Arial,sans-serif;
+  line-height:1.5;
+  min-height:100vh;     /* ↓ to trzy linie, które „dociskają” stopkę do dołu */
+  display:flex;
+  flex-direction:column;
+}
     .container{max-width:var(--maxw);margin:0 auto;padding:clamp(16px,3vw,32px)}
     .masthead{text-align:center;padding-top:clamp(20px,6vh,48px)}
     .title{font-family:"Archivo Black",system-ui,sans-serif;font-size:clamp(48px,9vw,120px);line-height:1.05;margin:0}
@@ -110,6 +119,26 @@
     stroke-dasharray: none; stroke-dashoffset: 0;
   }
 }
+/* footer (spójny z contact/work) */
+footer{ margin-top:auto; border-top:1px solid #e5e5e5 }
+footer .container{ color:#9aa0a6; font-size:14px }
+
+footer .foot{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; flex-wrap:wrap;
+}
+footer .socials{
+  display:flex; align-items:center; gap:10px;
+  color:inherit; font-size:inherit;
+}
+footer .socials a{ color:inherit; text-decoration:none }
+footer .socials a:hover{ text-decoration:underline }
+footer .socials .sep{ opacity:.6; user-select:none }
+
+/* na bardzo wąskich ekranach wycentruj */
+@media (max-width:520px){
+  footer .foot{ justify-content:center; gap:8px }
+}
 
   </style>
 </head>
@@ -155,5 +184,22 @@
   setTimeout(hide, 2500);                 // fallback, gdyby load się opóźnił
 })();
 </script>
+  <footer>
+  <div class="container">
+    <div class="foot">
+      <div>© <span id="y"></span> malepszym</div>
+      <nav class="socials" aria-label="social links">
+        <a href="http://instagram.com/malepszym" target="_blank" rel="noopener noreferrer">instagram</a>
+        <span class="sep">/</span>
+        <a href="https://www.linkedin.com/in/martyna-malepszy-616598207/" target="_blank" rel="noopener noreferrer">linkedin</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+<script>
+  // rok w stopce
+  document.getElementById('y').textContent = new Date().getFullYear();
+</script>
+
 </body>
 </html>
