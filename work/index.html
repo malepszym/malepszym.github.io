@@ -250,6 +250,29 @@
 @media (max-width: 900px){
   .lb-thumbs{ display:none }
 }
+    /* ===== Floating back arrow (only arrow, not whole bar) ===== */
+.back-fab{
+  position: fixed;
+  left: clamp(10px, 2vw, 18px);
+  top:  clamp(10px, 2vw, 18px);
+  width: 44px; height: 44px;
+  display: grid; place-items: center;
+  background: var(--bg); color: var(--fg);
+  border: 1px solid #e5e5e5; border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0,0,0,.08);
+  font-family: "Archivo Black", system-ui, sans-serif;
+  font-size: 24px; line-height: 1; text-decoration: none;
+  z-index: 45;             /* lightbox ma 50 – strzałka będzie pod nim */
+  opacity: 0; transform: translateY(-6px);
+  pointer-events: none; transition: opacity .25s ease, transform .25s ease;
+}
+.back-fab.show{ opacity: 1; transform: none; pointer-events: auto; }
+.back-fab:hover{ filter: brightness(1.02); }
+.back-fab:focus-visible{ outline: 3px solid #000; outline-offset: 3px; }
+
+@media (max-width:700px){
+  .back-fab{ width: 40px; height: 40px; font-size: 22px; }
+}
   </style>
 </head>
 <body>
@@ -534,5 +557,20 @@ document.querySelectorAll('.frame').forEach(btn=>{
   });
 })();
 </script>
+  <script>
+(() => {
+  const fab = document.getElementById('backFab');
+  const header = document.querySelector('header');    // Twój górny pasek
+  if (!fab || !header) return;
+
+  // Pokaż strzałkę dopiero, gdy header zniknie z widoku
+  const io = new IntersectionObserver(([entry]) => {
+    fab.classList.toggle('show', !entry.isIntersecting);
+  }, { threshold: 0 });
+  io.observe(header);
+})();
+</script>
+  <a id="backFab" class="back-fab" href="/" aria-label="Back to home" title="Back to home">←</a>
+  <a id="backFab" class="back-fab show" href="/">←</a>
 </body>
 </html>
