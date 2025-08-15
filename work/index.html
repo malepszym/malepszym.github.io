@@ -254,9 +254,51 @@
     .to-top:hover{ filter:brightness(1.05) }
     .to-top:focus-visible{ outline:3px solid #000; outline-offset:3px }
     @media (max-width:640px){ .to-top{ width:56px; height:56px; font-size:24px } }
+    /* ===== PRELOADER „mm” ===== */
+#preloader{
+  position: fixed; inset: 0; z-index: 9999;
+  display: grid; place-items: center;
+  background: var(--bg); color: var(--fg);
+  transition: opacity .4s ease, visibility .4s ease;
+}
+#preloader.hidden{ opacity: 0; visibility: hidden }
+
+#preloader svg{ width: clamp(120px, 26vw, 260px); height: auto }
+#preloader .mm{
+  font-family: "Archivo Black", system-ui, sans-serif;
+  font-size: 180px; /* skaluje się przez viewBox */
+  fill: transparent;                    /* na start tylko kontur */
+  stroke: currentColor; stroke-width: 10; stroke-linejoin: round;
+  paint-order: stroke fill;             /* najpierw kontur, potem wypełnienie */
+  /* ANIMACJE */
+  /* 1) delikatne „rysowanie” konturu (opcjonalne, ale działa w nowoczesnych przeglądarkach) */
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 1400;
+  animation: mm-draw .7s ease-out forwards, mm-fill .45s ease-out .65s forwards;
+}
+
+/* 2) wypełnienie po chwili */
+@keyframes mm-fill { to { fill: currentColor; } }
+/* 1) rysowanie konturu */
+@keyframes mm-draw { to { stroke-dashoffset: 0; } }
+
+/* Szacunek dla reduced motion */
+@media (prefers-reduced-motion: reduce){
+  #preloader .mm{
+    animation: mm-fill .2s linear .2s forwards;
+    stroke-dasharray: none; stroke-dashoffset: 0;
+  }
+}
+
   </style>
 </head>
 <body>
+  <div id="preloader" role="status" aria-live="polite">
+  <svg viewBox="0 0 600 240" aria-label="Loading">
+    <text x="50%" y="58%" text-anchor="middle" class="mm">mm</text>
+  </svg>
+</div>
+
   <header class="container top">
     <a class="back" href="/" aria-label="Wróć na stronę główną"><span class="arrow">←</span><span>malepszym</span></a>
     <span class="section-label">work</span>
@@ -524,5 +566,28 @@
       io.observe(header);
     })();
   </script>
+  <script>
+(() => {
+  const pre = document.getElementById('preloader');
+  if (!pre) return;
+
+  const MIN_SHOW = 450;           // min. czas wyświetlania, żeby nie migało
+  const start = performance.now();
+
+  const hide = () => {
+    const elapsed = performance.now() - start;
+    const wait = Math.max(0, MIN_SHOW - elapsed);
+    setTimeout(() => {
+      pre.classList.add('hidden');
+      pre.addEventListener('transitionend', () => pre.remove(), { once:true });
+      document.documentElement.classList.add('app-ready');
+    }, wait);
+  };
+
+  window.addEventListener('load', hide);  // chowamy po pełnym załadowaniu
+  setTimeout(hide, 2500);                 // fallback, gdyby load się opóźnił
+})();
+</script>
+
 </body>
 </html>
