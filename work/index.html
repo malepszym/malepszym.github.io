@@ -289,6 +289,43 @@
     stroke-dasharray: none; stroke-dashoffset: 0;
   }
 }
+/* ===== Project credits (infinite sliding) ===== */
+.credits{
+  position:relative; overflow:hidden;
+  margin: clamp(6px, 2.5vh, 20px) 0 0;
+}
+
+/* delikatne wygaszenie krawędzi */
+.credits::before,.credits::after{
+  content:""; position:absolute; top:0; bottom:0; width:64px; pointer-events:none;
+}
+.credits::before{ left:0;  background:linear-gradient(to right, var(--bg), transparent); }
+.credits::after { right:0; background:linear-gradient(to left,  var(--bg), transparent); }
+
+.credits-track{
+  display:flex; width:max-content; gap:64px;            /* odstęp między powtórkami */
+  animation: marquee var(--speed, 22s) linear infinite;
+  will-change: transform;
+}
+.credits:hover .credits-track{ animation-play-state: paused; }
+
+.credits-line{
+  white-space:nowrap; color:#9aa0a6; font-style:italic;
+  font-size: clamp(14px, 1.8vw, 22px); letter-spacing:.2px;
+}
+
+/* ruch o 50% – mamy dwie identyczne linie, więc pętla jest bezszwowa */
+@keyframes marquee{
+  from{ transform: translateX(0) }
+  to  { transform: translateX(-50%) }
+}
+
+/* szacunek dla reduced motion: bez animacji, można przewinąć ręcznie */
+@media (prefers-reduced-motion: reduce){
+  .credits{ overflow:auto }
+  .credits-track{ animation:none }
+  .credits::before,.credits::after{ display:none }
+}
 
   </style>
 </head>
@@ -326,6 +363,13 @@
         </h2>
         <p class="project-roles">styling · co-creative direction</p>
       </section>
+      <div class="credits reveal from-bottom" aria-label="Project credits">
+  <div class="credits-track" style="--speed: 24s;">
+    <div class="credits-line"> osama ahmed – clifford adu – zofia gizan - łukasz szywalski - adrian dudzinski - kaja mann - olga starzynska - youssef mongach - maria jakubowska - &others </div>
+    <div class="credits-line" aria-hidden="true">osama ahmed – clifford adu – zofia gizan - łukasz szywalski - adrian dudzinski - kaja mann - olga starzynska - youssef mongach - maria jakubowska - natalia kraskowska - &others</div>
+  </div>
+</div>
+
     </div>
 
     <!-- PROJECT 2 — kajamann.clothing -->
@@ -347,6 +391,13 @@
         </h2>
         <p class="project-roles">styling · creative assistant</p>
       </section>
+      <div class="credits reveal from-bottom" aria-label="Project credits">
+  <div class="credits-track" style="--speed: 24s;">
+    <div class="credits-line"> kaja mann - olga starzynska - zofia lebiocka - paulina nowak </div>
+    <div class="credits-line" aria-hidden="true"> kaja mann - olga starzynska - zofia lebiocka - paulina nowak </div>
+  </div>
+</div>
+
     </div>
 
     <!-- PROJECT 3 — Tabusie (YouTube) -->
@@ -366,6 +417,13 @@
         </h2>
         <p class="project-roles">project coordinator · production assistant</p>
       </section>
+      <div class="credits reveal from-bottom" aria-label="Project credits">
+  <div class="credits-track" style="--speed: 24s;">
+    <div class="credits-line">filip luft – maciej magowski – ewelina janus – dominika soćko – patryk dróżdż – jakub machoj – joanna darnikiewicz – adam gmurczyk – robert senderowski – yeva tsinska – paweł rupiński – krystian kościjański – malina kościjańska – antek luft – ania luft – rafał mikulski</div>
+    <div class="credits-line" aria-hidden="true">filip luft – maciej magowski – ewelina janus – dominika soćko – patryk dróżdż – jakub machoj – joanna darnikiewicz – adam gmurczyk – robert senderowski – yeva tsinska – paweł rupiński – krystian kościjański – malina kościjańska – antek luft – ania luft – rafał mikulski</div>
+  </div>
+</div>
+
     </div>
   </main>
 
