@@ -56,10 +56,12 @@
 
     /* wiersz tytułu – centruje całość */
 .title-row{
-  display:flex;
-  justify-content:center;
-  margin: clamp(24px, 6vh, 48px) 0;
+  position: relative;                          /* kotwica dla .hot-note */
+  display: inline-block;                       /* szerokość = szerokość tytułu */
+  margin: clamp(24px, 6vh, 48px) auto;         /* wyśrodkuj blok w poziomie */
 }
+.title-row .title{ margin: 0; text-align: center; }
+
 
 /* wrapper, żeby notkę przypiąć do PRAWEGO dołu tytułu */
 .title-wrap{
@@ -72,8 +74,8 @@
 /* notka: pod tytułem, wyrównana do jego PRAWEGO brzegu */
 .hot-note{
   position: absolute;
-  right: 0;                               /* prawa krawędź = prawa krawędź H1 */
-  top: calc(100% + 2px);                  /* odstęp w dół (zmienisz np. na 10–14px) */
+  right: 0;                         /* prawa krawędź = prawa krawędź tytułu */
+  top: calc(100% + 4px);            /* odległość pod tytułem */
   font-family:"Archivo Black", system-ui, sans-serif;
   color: var(--muted);
   font-size: clamp(12px, 1.8vw, 18px);
