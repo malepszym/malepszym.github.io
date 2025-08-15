@@ -669,5 +669,32 @@
   init();
 })();
 </script>
+  <script>
+(() => {
+  // Szanujemy reduce motion
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const PX_PER_SEC = 80;           // docelowa prędkość (px/s) – zmień wg uznania
+  const MIN_SEC   = 12;            // dolny limit, żeby nie było zbyt szybko
+
+  function normalizeCreditsSpeed(){
+    document.querySelectorAll('.credits').forEach(c=>{
+      const track = c.querySelector('.credits-track');
+      if(!track) return;
+      // Pętla jest bezszwowa co 50% własnej szerokości:
+      const distance = track.scrollWidth / 2;    // px
+      const duration = Math.max(MIN_SEC, distance / PX_PER_SEC); // s
+      track.style.setProperty('--speed', `${duration}s`);
+    });
+  }
+
+  // Po załadowaniu fontów, żeby szerokość była poprawna
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve())
+    .then(normalizeCreditsSpeed);
+
+  // Aktualizuj przy zmianie rozmiaru
+  window.addEventListener('resize', normalizeCreditsSpeed);
+})();
+</script>
 </body>
 </html>
