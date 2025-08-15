@@ -44,38 +44,6 @@
       font-family:"Archivo Black",system-ui,sans-serif; font-size:22px}
     .arrow{font-size:28px; line-height:1; transform:translateY(-1px)}
     .section-label{color:var(--muted); font-weight:700; text-transform:lowercase}
-
-    /* STUCK VARIANT: ta sama strzałka przypięta */
-    .back.stuck{
-  position: fixed;
-  /* lewa krawędź kontenera + jego padding */
-  left: calc( max((100vw - var(--maxw)) / 2, 0px) + clamp(16px, 3vw, 32px) );
-  /* ta sama wysokość co header (padding kontenera) */
-  top:  clamp(16px, 3vw, 32px);
-  z-index: 55; /* jeśli chcesz mieć nad lightboxem */
-  display: grid; place-items: center;
-  width: 36px; height: 36px;
-  background: var(--bg); color: var(--fg);
-  border: 1px solid #e5e5e5; border-radius: 10px;
-  box-shadow: 0 8px 16px rgba(0,0,0,.08);
-  padding: 0; gap: 0;
-}
-
-/* ukrycie napisu przy „stuck” zostaw bez zmian */
-.back.stuck span:nth-of-type(2){
-  position:absolute !important; width:1px; height:1px; overflow:hidden; white-space:nowrap;
-  clip:rect(0 0 0 0); clip-path:inset(50%);
-}
-.back.stuck .arrow{ font-size:24px; transform:none }
-    /* ukryj wizualnie napis "malepszym" gdy stuck (A11y zostaje) */
-    .back.stuck span:nth-of-type(2){
-      position:absolute !important; width:1px; height:1px; overflow:hidden; white-space:nowrap;
-      clip:rect(0 0 0 0); clip-path:inset(50%);
-    }
-    .back.stuck .arrow{ font-size:24px; transform:none }
-    @media (max-width:700px){
-      .back.stuck{ width:40px; height:40px }
-      .back.stuck .arrow{ font-size:22px }
     }
 
     /* page title */
@@ -271,17 +239,36 @@
     .lb-thumb img{ width:100%; height:100%; object-fit:cover; display:block }
     .lb-thumb.active{ opacity:1; outline-color:#fff }
     @media (max-width: 900px){ .lb-thumbs{ display:none } }
-    /* OVERRIDE: mniejszy kwadrat sticky-strzałki */
-header .back.stuck{
-  width: 38px;
-  height: 38px;
+}
+    /* STUCK VARIANT — JEDYNY blok */
+.back.stuck{
+  position: fixed;
+  /* zakotwiczenie do lewej krawędzi .container */
+  left: calc( max((100vw - var(--maxw)) / 2, 0px) + clamp(16px, 3vw, 32px) );
+  top:  clamp(16px, 3vw, 32px);
+  z-index: 55;
+  display: grid; place-items: center;
+  width: 36px;   /* ← tu ustawiasz docelowy rozmiar kwadratu */
+  height: 36px;
+  background: var(--bg); color: var(--fg);
+  border: 1px solid #e5e5e5; border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0,0,0,.08);
+  padding: 0; gap: 0;
+}
+/* ukryj wizualnie napis "malepszym" gdy sticky (a11y zostaje) */
+.back.stuck span:nth-of-type(2){
+  position:absolute !important; width:1px; height:1px; overflow:hidden; white-space:nowrap;
+  clip:rect(0 0 0 0); clip-path:inset(50%);
+}
+/* strzałka zostaje jak była */
+.back.stuck .arrow{ font-size:24px; transform:none }
+
+/* MOBILE — jeśli chcesz inny rozmiar na telefonie, ustaw tu, albo usuń bloczek całkiem */
+@media (max-width:700px){
+  .back.stuck{ width:40px; height:40px; }
+  .back.stuck .arrow{ font-size:22px; }
 }
 
-/* jeśli masz gdzieś @media (max-width:700px) ustawiające 40px,
-   to albo je usuń, albo nadpisz tak samo: */
-@media (max-width:700px){
-  header .back.stuck{ width: 38px; height: 38px; }
-}
   </style>
 </head>
 <body>
