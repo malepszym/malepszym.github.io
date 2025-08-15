@@ -47,17 +47,26 @@
 
     /* STUCK VARIANT: ta sama strzałka przypięta */
     .back.stuck{
-      position: fixed;
-      left: clamp(10px, 2vw, 18px);
-      top:  clamp(10px, 2vw, 18px);
-      z-index: 55; /* lightbox ma 50 */
-      display: grid; place-items: center;
-      width: 44px; height: 44px;
-      background: var(--bg); color: var(--fg);
-      border: 1px solid #e5e5e5; border-radius: 10px;
-      box-shadow: 0 8px 16px rgba(0,0,0,.08);
-      padding: 0; gap: 0;
-    }
+  position: fixed;
+  /* lewa krawędź kontenera + jego padding */
+  left: calc( max((100vw - var(--maxw)) / 2, 0px) + clamp(16px, 3vw, 32px) );
+  /* ta sama wysokość co header (padding kontenera) */
+  top:  clamp(16px, 3vw, 32px);
+  z-index: 55; /* jeśli chcesz mieć nad lightboxem */
+  display: grid; place-items: center;
+  width: 44px; height: 44px;
+  background: var(--bg); color: var(--fg);
+  border: 1px solid #e5e5e5; border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0,0,0,.08);
+  padding: 0; gap: 0;
+}
+
+/* ukrycie napisu przy „stuck” zostaw bez zmian */
+.back.stuck span:nth-of-type(2){
+  position:absolute !important; width:1px; height:1px; overflow:hidden; white-space:nowrap;
+  clip:rect(0 0 0 0); clip-path:inset(50%);
+}
+.back.stuck .arrow{ font-size:24px; transform:none }
     /* ukryj wizualnie napis "malepszym" gdy stuck (A11y zostaje) */
     .back.stuck span:nth-of-type(2){
       position:absolute !important; width:1px; height:1px; overflow:hidden; white-space:nowrap;
