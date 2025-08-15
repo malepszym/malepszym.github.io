@@ -271,6 +271,17 @@
     .lb-thumb img{ width:100%; height:100%; object-fit:cover; display:block }
     .lb-thumb.active{ opacity:1; outline-color:#fff }
     @media (max-width: 900px){ .lb-thumbs{ display:none } }
+    /* OVERRIDE: mniejszy kwadrat sticky-strzałki */
+header .back.stuck{
+  width: 38px;
+  height: 38px;
+}
+
+/* jeśli masz gdzieś @media (max-width:700px) ustawiające 40px,
+   to albo je usuń, albo nadpisz tak samo: */
+@media (max-width:700px){
+  header .back.stuck{ width: 38px; height: 38px; }
+}
   </style>
 </head>
 <body>
