@@ -54,6 +54,29 @@
     .back:hover .arrow{transform:translate(-2px,-1px)}
     .section-label{color:var(--muted); font-weight:700; text-transform:lowercase}
 
+    /* wiersz tytułu z małą notką */
+.title-row{
+  display:flex;
+  align-items:flex-end;                /* żeby mały tekst siedział przy dole liter */
+  justify-content:center;
+  gap:clamp(12px,1.8vw,20px);
+  margin:clamp(24px,6vh,48px) 0;       /* przenosimy margines z .title na wiersz */
+}
+.title-row .title{ margin:0 }          /* .title miało własny margin — zerujemy go TU */
+.hot-note{
+  font-family:"Archivo Black", system-ui, sans-serif;
+  color:var(--muted);
+  font-size:clamp(12px,1.8vw,18px);
+  letter-spacing:.3px;
+  white-space:nowrap;
+}
+
+/* na mobile niech wejdzie pod tytuł */
+@media (max-width:720px){
+  .title-row{ flex-direction:column; align-items:center; gap:6px }
+}
+
+    
     /* tytuł */
     .title{
       font-family:"Archivo Black", system-ui, sans-serif;
@@ -161,7 +184,10 @@ footer .socials .sep{ opacity:.6; user-select:none }
   </header>
 
   <main class="container">
-    <h1 class="title anim slide-down delay-1">GET IN TOUCH</h1>
+    <div class="title-row">
+  <h1 class="title anim slide-down delay-1">GET IN TOUCH</h1>
+  <span class="hot-note anim slide-down delay-2">it’s hot ;)</span>
+</div>
 
     <div class="scatter" aria-label="Sposoby kontaktu">
       <a id="cta-mail" class="cta anim slide-left delay-2"
