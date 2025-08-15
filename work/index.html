@@ -228,6 +228,28 @@
 .see-more span{ position: relative; z-index: 1; }
 .frame.has-more:hover .see-more,
 .frame.has-more:focus-visible .see-more{ opacity: 1; }
+    /* ===== Pasek miniaturek w lightboxie ===== */
+.lb-thumbs{
+  position:absolute; left:50%; transform:translateX(-50%);
+  bottom:16px;
+  display:flex; gap:10px; padding:8px 10px;
+  background:rgba(0,0,0,.35); border-radius:10px;
+  max-width:96vw; overflow-x:auto; z-index:2;
+  -webkit-overflow-scrolling: touch;
+}
+.lb-thumb{
+  appearance:none; border:0; padding:0; margin:0; cursor:pointer;
+  width:clamp(44px, 6vw, 72px); height:clamp(44px, 6vw, 72px);
+  border-radius:6px; overflow:hidden; opacity:.6; outline:2px solid transparent;
+  flex:0 0 auto; background:#000;
+}
+.lb-thumb img{ width:100%; height:100%; object-fit:cover; display:block }
+.lb-thumb.active{ opacity:1; outline-color:#fff }
+
+/* Ukryj pasek miniaturek na mobile */
+@media (max-width: 900px){
+  .lb-thumbs{ display:none }
+}
   </style>
 </head>
 <body>
@@ -305,6 +327,8 @@
   <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Galeria">
     <button class="lb-btn lb-prev"  aria-label="Poprzednie">‹</button>
     <div class="lb-track" id="lbTrack" tabindex="0"></div>
+      <!-- Pasek miniaturek (desktop) -->
+  <div class="lb-thumbs" id="lbThumbs" aria-label="Miniatury"></div>
     <button class="lb-btn lb-next"  aria-label="Następne">›</button>
     <button class="lb-btn lb-close" id="lbClose" aria-label="Zamknij">×</button>
   </div>
@@ -354,19 +378,60 @@
     const btnPrev = document.querySelector('.lb-prev');
     const btnNext = document.querySelector('.lb-next');
     const btnClose= document.getElementById('lbClose');
+    const thumbs  = document.getElementById('lbThumbs');
+
 
     let group = null;
     let index = 0;
 
     function renderTrack(list){
-      track.innerHTML = '';
-      list.forEach((src,i)=>{
-        const img = document.createElement('img');
-        img.src = src;
-        img.alt = `Zdjęcie ${i+1}`;
-        track.appendChild(img);
-      });
+  // wyczyść slajdy i miniatury
+  track.innerHTML = '';
+  if (thumbs) thumbs.innerHTML = '';
+
+  list.forEach((src,i)=>{
+    // slajd
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = `Zdjęcie ${i+1}`;
+    track.appendChild(img);
+
+    // miniatura
+    if (thumbs){
+      const th = document.createElement('button');
+      th.className = 'lb-thumb';
+      th.setAttribute('aria-label', `Pokaż zdjęcie ${i+1}`);
+
+      const timg = document.createElement('img');
+      timg.src = src;
+      timg.alt = '';
+      th.appendChild(timg);
+
+      th.addEventListener('click', ()=> jumpTo(i));
+      thumbs.appendChild(th);
     }
+  });
+}
+function updateThumbsActive(){
+  if (!thumbs) return;
+  const items = thumbs.querySelectorAll('.lb-thumb');
+  items.forEach((el, i)=> el.classList.toggle('active', i === index));
+
+  // przewiń pasek, żeby aktywna miniatura była w centrum
+  const active = items[index];
+  if (active){
+    const center = active.offsetLeft - (thumbs.clientWidth/2 - active.clientWidth/2);
+    thumbs.scrollTo({ left: Math.max(0, center), behavior: 'smooth' });
+  }
+}
+
+function jumpTo(i){
+  index = i;
+  const w = track.clientWidth;
+  track.scrollTo({ left: w * index, behavior: 'smooth' });
+  updateThumbsActive();
+}
+
 
     function openLightbox(g, i=0){
       group = g; index = i;
@@ -377,6 +442,7 @@
         const w = track.clientWidth;
         track.scrollTo({ left: w * index, behavior: 'instant' });
         track.focus({ preventScroll: true });
+        updateThumbsActive();
       });
     }
     function closeLightbox(){
@@ -390,6 +456,7 @@
       index = (index + delta + count) % count;
       const w = track.clientWidth;
       track.scrollTo({ left: w * index, behavior: 'smooth' });
+      updateThumbsActive();
     }
 
     // Kliknięcia miniatur + automatyczny overlay "see more" gdy jest >3 zdjęć
@@ -438,6 +505,7 @@ document.querySelectorAll('.frame').forEach(btn=>{
       timer = setTimeout(()=>{
         const w = track.clientWidth;
         index = Math.round(track.scrollLeft / w);
+        updateThumbsActive();
       }, 80);
     });
   </script>
