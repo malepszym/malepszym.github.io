@@ -76,11 +76,16 @@
       .back.stuck .arrow{ font-size:22px }
     }
 
+    /* ciaśniej nad tytułem (tylko główna zawartość, nie header) */
+main.container{
+  padding-top: clamp(10px, 2vw, 20px);  /* było 16–32px na .container */
+}
+    
     /* page title */
     .page-title{
       font-family:"Archivo Black",system-ui,sans-serif;
       text-align:center; font-size:clamp(44px,10vw,120px);
-      line-height:1.05; margin:clamp(24px,6vh,48px) 0;
+      line-height:1.05; margin: clamp(16px,4.5vh,36px) 0 clamp(12px,3vh,22px);
       letter-spacing:1px;
     }
 
@@ -348,6 +353,16 @@ footer .socials a:hover{
 footer .socials .sep{ opacity:.6; user-select:none }
 @media (max-width:520px){
   footer .foot{ justify-content:center; gap:8px }
+}
+    /* TYLKO DESKTOP – ciaśniej nad i pod tytułem */
+@media (min-width:701px){
+  main.container{
+    padding-top: clamp(10px, 2vw, 20px);
+  }
+  .page-title{
+    /* było: margin: clamp(24px,6vh,48px) 0; */
+    margin: clamp(16px, 4.5vh, 36px) 0 clamp(12px, 3vh, 22px);
+  }
 }
   </style>
 </head>
