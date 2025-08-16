@@ -291,50 +291,37 @@
     }
   }
 
-/* ===== Project credits (infinite sliding) ===== */
-.credits{
-  position:relative; overflow:hidden;
-  margin: clamp(6px, 2.5vh, 20px) 0 0;
-}
+  /* ===== Project credits (infinite sliding) ===== */
+  .credits{
+    position:relative; overflow:hidden;
+    margin: clamp(6px, 2.5vh, 20px) 0 0;
+  }
+  .credits::before,.credits::after{
+    content:""; position:absolute; top:0; bottom:0; width:64px; pointer-events:none;
+  }
+  .credits::before{ left:0;  background:linear-gradient(to right, var(--bg), transparent); }
+  .credits::after { right:0; background:linear-gradient(to left,  var(--bg), transparent); }
 
-/* delikatne wygaszenie krawędzi */
-.credits::before,.credits::after{
-  content:""; position:absolute; top:0; bottom:0; width:64px; pointer-events:none;
-}
-.credits::before{ left:0;  background:linear-gradient(to right, var(--bg), transparent); }
-.credits::after { right:0; background:linear-gradient(to left,  var(--bg), transparent); }
+  .credits-track{
+    display:flex; width:max-content; gap:64px;
+    animation: marquee var(--speed, 22s) linear infinite;
+    will-change: transform;
+  }
+  .credits:hover .credits-track{ animation-play-state: paused; }
 
-/* tor animacji – bez gapu między połówkami */
-.credits-track{
-  display:flex; width:max-content;
-  animation: marquee var(--speed, 22s) linear infinite;
-  will-change: transform;
-}
-.credits:hover .credits-track{ animation-play-state: paused; }
-
-/* pojedyncza linia kredytów */
-.credits-line{
-  white-space:nowrap; color:#9aa0a6; font-style:italic;
-  font-size: clamp(14px, 1.8vw, 22px); letter-spacing:.2px;
-}
-
-/* POŁÓWKA – zawiera kilka .credits-line, żeby zapełnić szerokość paska */
-.credits-half{
-  display:flex; align-items:center; gap:64px;   /* ten gap musi zgadzać się z JS */
-}
-
-/* ruch o 50% całego toru = bezszwowa pętla dwóch identycznych połówek */
-@keyframes marquee{
-  from{ transform: translateX(0) }
-  to  { transform: translateX(-50%) }
-}
-
-/* reduced motion */
-@media (prefers-reduced-motion: reduce){
-  .credits{ overflow:auto }
-  .credits-track{ animation:none }
-  .credits::before,.credits::after{ display:none }
-}
+  .credits-line{
+    white-space:nowrap; color:#9aa0a6; font-style:italic;
+    font-size: clamp(14px, 1.8vw, 22px); letter-spacing:.2px;
+  }
+  @keyframes marquee{
+    from{ transform: translateX(0) }
+    to  { transform: translateX(-50%) }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .credits{ overflow:auto }
+    .credits-track{ animation:none }
+    .credits::before,.credits::after{ display:none }
+  }
 
   /* footer layout + socials */
   footer .foot{
@@ -713,58 +700,31 @@
   init();
 })();
 </script>
- <script>
+  <script>
 (() => {
+  // Szanujemy reduce motion
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  const PX_PER_SEC = 80;   // prędkość docelowa (px/s)
-  const MIN_SEC    = 12;   // minimalny czas pełnego cyklu
-  const GAP        = 64;   // musi być taki sam jak w .credits-half { gap:64px }
+  const PX_PER_SEC = 80;           // docelowa prędkość (px/s) – zmień wg uznania
+  const MIN_SEC   = 12;            // dolny limit, żeby nie było zbyt szybko
 
-  function buildCreditsHalf(container, text){
-    const half = document.createElement('div');
-    half.className = 'credits-half';
-
-    // Dokładaj kopie aż połowa będzie szersza niż widoczny pasek
-    // (trochę zapasu, żeby gradient nie „zjadał” początku).
-    do {
-      const span = document.createElement('span');
-      span.className = 'credits-line';
-      span.textContent = text;
-      half.appendChild(span);
-    } while (half.scrollWidth < container.clientWidth + GAP * 2);
-
-    return half;
-  }
-
-  function rebuildAndNormalize(){
-    document.querySelectorAll('.credits').forEach(c => {
+  function normalizeCreditsSpeed(){
+    document.querySelectorAll('.credits').forEach(c=>{
       const track = c.querySelector('.credits-track');
-      if (!track) return;
-
-      // Weź tekst z pierwszej istniejącej linii (Twoje HTML-e mogą mieć już 2 kopie)
-      const firstLine = track.querySelector('.credits-line');
-      if (!firstLine) return;
-      const text = firstLine.textContent.trim();
-
-      // Zbuduj od zera dwie IDENTYCZNE połówki
-      track.innerHTML = '';
-      const half1 = buildCreditsHalf(c, text);
-      const half2 = half1.cloneNode(true);
-      half2.setAttribute('aria-hidden', 'true');
-      track.append(half1, half2);
-
-      // Ustal czas animacji proporcjonalnie do długości połowy
-      const distance = track.scrollWidth / 2;                 // px
-      const duration = Math.max(MIN_SEC, distance / PX_PER_SEC);
+      if(!track) return;
+      // Pętla jest bezszwowa co 50% własnej szerokości:
+      const distance = track.scrollWidth / 2;    // px
+      const duration = Math.max(MIN_SEC, distance / PX_PER_SEC); // s
       track.style.setProperty('--speed', `${duration}s`);
     });
   }
 
+  // Po załadowaniu fontów, żeby szerokość była poprawna
   (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve())
-    .then(rebuildAndNormalize);
+    .then(normalizeCreditsSpeed);
 
-  window.addEventListener('resize', rebuildAndNormalize);
+  // Aktualizuj przy zmianie rozmiaru
+  window.addEventListener('resize', normalizeCreditsSpeed);
 })();
 </script>
 </body>
