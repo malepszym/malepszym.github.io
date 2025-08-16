@@ -28,343 +28,327 @@
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
-    :root{
-      --bg:#eee; --fg:#111; --muted:#bfbfbf;
-      --maxw:1200px; --gap:28px;
-      --underline:3px; --offset:6px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; background:var(--bg); color:var(--fg);
-      font-family:Inter,system-ui,Arial,sans-serif;
-      min-height:100vh; display:flex; flex-direction:column; line-height:1.6;
-    }
-    .container{max-width:var(--maxw); margin:0 auto; padding:clamp(16px,3vw,32px); width:100%}
-
-    /* top bar */
-    .top{display:flex; align-items:center; justify-content:space-between}
-    .back{display:inline-flex; align-items:center; gap:12px; text-decoration:none; color:inherit;
-      font-family:"Archivo Black",system-ui,sans-serif; font-size:22px}
-    .arrow{font-size:28px; line-height:1; transform:translateY(-1px)}
-    .section-label{color:var(--muted); font-weight:700; text-transform:lowercase}
-
-    /* === STUCK: ta sama strzałka przypięta względem .container === */
-    .back.stuck{
-      position: fixed;
-      /* lewa krawędź kontenera + jego padding */
-      left: calc( max((100vw - var(--maxw)) / 2, 0px) + clamp(16px, 3vw, 32px) );
-      /* ta sama wysokość co padding kontenera */
-      top:  clamp(16px, 3vw, 32px);
-      z-index: 45; /* lightbox ma 50; zmień na 55, jeśli chcesz nad lightboxem */
-      display: grid; place-items: center;
-      width: 36px; height: 36px;         /* ← rozmiar kwadratu */
-      background: var(--bg); color: var(--fg);
-      border: 1px solid #e5e5e5; border-radius: 10px;
-      box-shadow: 0 8px 16px rgba(0,0,0,.08);
-      padding: 0; gap: 0;
-    }
-    /* ukryj wizualnie napis "malepszym" w trybie stuck (A11y zostaje) */
-    .back.stuck span:nth-of-type(2){
-      position:absolute !important; width:1px; height:1px; overflow:hidden; white-space:nowrap;
-      clip:rect(0 0 0 0); clip-path:inset(50%);
-    }
-    /* strzałka zostaje jak była */
-    .back.stuck .arrow{ font-size:24px; transform:none }
-    @media (max-width:700px){
-      .back.stuck{ width:36px; height:36px }
-      .back.stuck .arrow{ font-size:22px }
-    }
-
-    /* ciaśniej nad tytułem (tylko główna zawartość, nie header) */
-main.container{
-  padding-top: clamp(10px, 2vw, 20px);  /* było 16–32px na .container */
-}
-    
-    /* page title */
-    .page-title{
-      font-family:"Archivo Black",system-ui,sans-serif;
-      text-align:center; font-size:clamp(44px,10vw,120px);
-      line-height:1.05; margin: clamp(16px,4.5vh,36px) 0 clamp(12px,3vh,22px);
-      letter-spacing:1px;
-    }
-
-    /* gallery */
-    .gallery{
-      display:grid; gap:var(--gap);
-      grid-template-columns:repeat(3,1fr);
-      align-items:stretch;
-    }
-
-    /* clickable tiles (no default button chrome) */
-    .frame{
-      appearance:none; -webkit-appearance:none;
-      border:0; padding:0; margin:0;
-      background:transparent; line-height:0; cursor:pointer; display:block;
-      position:relative; overflow:hidden; /* dla overlayu */
-    }
-    .frame img{
-      display:block; width:100%; height:100%; object-fit:cover;
-      transition:filter .25s ease;
-    }
-    .frame:hover img{ filter:grayscale(100%) contrast(.95) brightness(.98) }
-    .frame:focus-visible{ outline:3px solid #000; outline-offset:6px; border-radius:6px }
-
-    /* meta pod galerią */
-    .project-meta{ text-align:center; margin:clamp(24px,6vh,48px) 0 }
-    .project-title{
-      font-family:"Archivo Black",system-ui,sans-serif;
-      font-size:clamp(36px,6.5vw,72px); line-height:1.08; margin:0 0 6px;
-    }
-    .project-roles{
-      font-family:"Archivo Black",system-ui,sans-serif;
-      font-size:clamp(18px,3vw,28px); margin:0;
-    }
-
-    /* underline dla linków w tytułach */
-    .link-underline{ position:relative; text-decoration:none; color:inherit }
-    .link-underline::after{
-      content:""; position:absolute; left:0; bottom:calc(var(--offset)*-1);
-      height:var(--underline); width:0; background:currentColor; transition:width .25s ease;
-    }
-    .link-underline:hover::after{ width:100% }
-
-    /* odstęp między projektami */
-    .project-block{ margin-top: clamp(40px, 10vh, 80px); }
-
-    /* responsywny YouTube 16:9 */
-    .video-wrap{
-      position:relative; width:100%; aspect-ratio:16/9;
-      background:#000; border-radius:8px; overflow:hidden;
-    }
-    .video-wrap iframe{
-      position:absolute; inset:0; width:100%; height:100%; border:0;
-    }
-
-    /* RWD */
-    @media (max-width:1000px){ .gallery{ grid-template-columns:repeat(2,1fr) } }
-    @media (max-width:640px){ .gallery{ grid-template-columns:1fr } }
-
-    /* LIGHTBOX (modal) */
-    .lightbox{
-      position:fixed; inset:0; z-index:50;
-      display:none; align-items:center; justify-content:center; gap:8px;
-      background:rgba(0,0,0,.75); padding:24px;
-    }
-    .lightbox.open{ display:flex }
-    .lb-track{
-      position:relative; width:min(1200px, 96vw); height:min(86vh, 900px);
-      overflow-x:auto; scroll-snap-type:x mandatory; display:flex; gap:0; background:#111;
-    }
-    .lb-track img{
-      flex:0 0 100%; height:100%; object-fit:contain; scroll-snap-align:center; background:#111;
-    }
-    .lb-btn{
-      appearance:none; border:0; background:rgba(255,255,255,.85); color:#111;
-      width:42px; height:42px; border-radius:999px; font-size:24px; line-height:1;
-      display:inline-grid; place-items:center; cursor:pointer;
-    }
-    .lb-btn:hover{ background:#fff }
-    .lb-close{ position:absolute; top:16px; right:16px }
-    .lb-prev, .lb-next{ align-self:center }
-    .lb-prev{ order:-1 } .lb-next{ order:2 }
-    .no-scroll{ overflow:hidden }
-
-    /* overlay "see more" */
-    .see-more{
-      position:absolute; inset:0; display:grid; place-items:center;
-      color:#fff; font-family:"Archivo Black",system-ui,sans-serif;
-      font-size:clamp(16px,2.2vw,22px); letter-spacing:.5px;
-      text-transform:lowercase;
-      opacity:0; transition:opacity .25s ease; pointer-events:none;
-    }
-    .see-more::before{ content:""; position:absolute; inset:0; background:rgba(0,0,0,.28) }
-    .see-more span{ position:relative; z-index:1 }
-    .frame.has-more:hover .see-more,
-    .frame.has-more:focus-visible .see-more{ opacity:1 }
-
-    /* Pasek miniaturek w lightboxie (desktop) */
-    .lb-thumbs{
-      position:absolute; left:50%; transform:translateX(-50%);
-      bottom:16px;
-      display:flex; gap:10px; padding:8px 10px;
-      background:rgba(0,0,0,.35); border-radius:10px;
-      max-width:96vw; overflow-x:auto; z-index:2;
-      -webkit-overflow-scrolling: touch;
-    }
-    .lb-thumb{
-      appearance:none; border:0; padding:0; margin:0; cursor:pointer;
-      width:clamp(44px, 6vw, 72px); height:clamp(44px, 6vw, 72px);
-      border-radius:6px; overflow:hidden; opacity:.6; outline:2px solid transparent;
-      flex:0 0 auto; background:#000;
-    }
-    .lb-thumb img{ width:100%; height:100%; object-fit:cover; display:block }
-    .lb-thumb.active{ opacity:1; outline-color:#fff }
-    @media (max-width: 900px){ .lb-thumbs{ display:none } }
-
-    /* ===== Scroll reveal ===== */
-    .reveal{
-      opacity:0; transform:translateY(16px);
-      transition:opacity .6s ease, transform .6s ease; will-change:opacity,transform;
-    }
-    .reveal.in{ opacity:1; transform:none }
-    .from-left{ transform:translateX(-24px) }
-    .from-right{ transform:translateX(24px) }
-    .from-bottom{ transform:translateY(16px) }
-    .reveal.in.from-left,.reveal.in.from-right,.reveal.in.from-bottom{ transform:none }
-    .delay-1{ transition-delay:.10s }
-    .delay-2{ transition-delay:.22s }
-    .delay-3{ transition-delay:.34s }
-    .delay-4{ transition-delay:.46s }
-    @media (prefers-reduced-motion:reduce){ .reveal{ opacity:1; transform:none; transition:none } }
-
-    /* footer */
-    footer{ margin-top:auto; border-top:1px solid #e5e5e5 }
-    footer .container{ color:#9aa0a6; font-size:14px }
-
-    /* --- MOBILE LIGHTBOX FIX --- */
-    @media (max-width: 768px){
-      .lightbox{ padding: 8px !important; }
-      .lb-btn{ width:36px; height:36px; font-size:20px }
-      .lb-close{ top:8px; right:8px }
-      .lightbox .lb-track{
-        width: 100vw;
-        height: 70vh !important;
-        height: 70svh !important;
-        height: 70dvh !important;
-      }
-      .lightbox .lb-track img{ width:100%; height:100%; object-fit:contain }
-    }
-    @media (max-width: 380px){
-      .lightbox .lb-track{
-        height: 66vh !important;
-        height: 66svh !important;
-        height: 66dvh !important;
-      }
-    }
-
-    /* Back to top */
-    .to-top{
-      position: fixed;
-      right: clamp(12px, 3vw, 24px);
-      bottom: clamp(12px, 3vw, 24px);
-      width: 48px; height: 48px;
-      border: 0; border-radius: 999px;
-      display: grid; place-items: center;
-      background: var(--fg); color: var(--bg);
-      font-family: "Archivo Black", system-ui, sans-serif;
-      font-size: 22px; line-height: 1;
-      box-shadow: 0 8px 18px rgba(0,0,0,.15);
-      opacity: 0; transform: translateY(12px);
-      pointer-events: none; transition: opacity .25s ease, transform .25s ease;
-      z-index: 45; /* lightbox ma 50 */
-    }
-    .to-top.show{ opacity:1; transform:none; pointer-events:auto }
-    .to-top:hover{ filter:brightness(1.05) }
-    .to-top:focus-visible{ outline:3px solid #000; outline-offset:3px }
-    @media (max-width:640px){ .to-top{ width:56px; height:56px; font-size:24px } }
-    /* ===== PRELOADER „mm” ===== */
-#preloader{
-  position: fixed; inset: 0; z-index: 9999;
-  display: grid; place-items: center;
-  background: var(--bg); color: var(--fg);
-  transition: opacity .4s ease, visibility .4s ease;
-}
-#preloader.hidden{ opacity: 0; visibility: hidden }
-
-#preloader svg{ width: clamp(120px, 26vw, 260px); height: auto }
-#preloader .mm{
-  font-family: "Archivo Black", system-ui, sans-serif;
-  font-size: 180px; /* skaluje się przez viewBox */
-  fill: transparent;                    /* na start tylko kontur */
-  stroke: currentColor; stroke-width: 10; stroke-linejoin: round;
-  paint-order: stroke fill;             /* najpierw kontur, potem wypełnienie */
-  /* ANIMACJE */
-  /* 1) delikatne „rysowanie” konturu (opcjonalne, ale działa w nowoczesnych przeglądarkach) */
-  stroke-dasharray: 1400;
-  stroke-dashoffset: 1400;
-  animation: mm-draw .7s ease-out forwards, mm-fill .45s ease-out .65s forwards;
-}
-
-/* 2) wypełnienie po chwili */
-@keyframes mm-fill { to { fill: currentColor; } }
-/* 1) rysowanie konturu */
-@keyframes mm-draw { to { stroke-dashoffset: 0; } }
-
-/* Szacunek dla reduced motion */
-@media (prefers-reduced-motion: reduce){
-  #preloader .mm{
-    animation: mm-fill .2s linear .2s forwards;
-    stroke-dasharray: none; stroke-dashoffset: 0;
+  :root{
+    --bg:#eee; --fg:#111; --muted:#bfbfbf;
+    --maxw:1200px; --gap:28px;
+    --underline:3px; --offset:6px;
   }
-}
-/* ===== Project credits (infinite sliding) ===== */
-.credits{
-  position:relative; overflow:hidden;
-  margin: clamp(6px, 2.5vh, 20px) 0 0;
-}
-
-/* delikatne wygaszenie krawędzi */
-.credits::before,.credits::after{
-  content:""; position:absolute; top:0; bottom:0; width:64px; pointer-events:none;
-}
-.credits::before{ left:0;  background:linear-gradient(to right, var(--bg), transparent); }
-.credits::after { right:0; background:linear-gradient(to left,  var(--bg), transparent); }
-
-.credits-track{
-  display:flex; width:max-content; gap:64px;            /* odstęp między powtórkami */
-  animation: marquee var(--speed, 22s) linear infinite;
-  will-change: transform;
-}
-.credits:hover .credits-track{ animation-play-state: paused; }
-
-.credits-line{
-  white-space:nowrap; color:#9aa0a6; font-style:italic;
-  font-size: clamp(14px, 1.8vw, 22px); letter-spacing:.2px;
-}
-
-/* ruch o 50% – mamy dwie identyczne linie, więc pętla jest bezszwowa */
-@keyframes marquee{
-  from{ transform: translateX(0) }
-  to  { transform: translateX(-50%) }
-}
-
-/* szacunek dla reduced motion: bez animacji, można przewinąć ręcznie */
-@media (prefers-reduced-motion: reduce){
-  .credits{ overflow:auto }
-  .credits-track{ animation:none }
-  .credits::before,.credits::after{ display:none }
-}
-/* footer layout + socials */
-footer .foot{
-  display:flex; align-items:center; justify-content:space-between;
-  gap:12px; flex-wrap:wrap;   /* na wąskich ekranach zawinie się elegancko */
-}
-footer .socials{
-  display:flex; align-items:center; gap:10px;
-  color:#9aa0a6; font-size:14px;   /* ten sam mały druk co lewa strona */
-}
-footer .socials a{
-  color:inherit; text-decoration:none;
-}
-footer .socials a:hover{
-  text-decoration:underline;
-}
-footer .socials .sep{ opacity:.6; user-select:none }
-@media (max-width:520px){
-  footer .foot{ justify-content:center; gap:8px }
-}
-    /* TYLKO DESKTOP – ciaśniej nad i pod tytułem */
-@media (min-width:701px){
-  main.container{
-    padding-top: clamp(10px, 2vw, 20px);
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--fg);
+    font-family:Inter,system-ui,Arial,sans-serif;
+    min-height:100vh; display:flex; flex-direction:column; line-height:1.6;
   }
+  .container{max-width:var(--maxw); margin:0 auto; padding:clamp(16px,3vw,32px); width:100%}
+
+  /* top bar */
+  .top{display:flex; align-items:center; justify-content:space-between}
+  .back{display:inline-flex; align-items:center; gap:12px; text-decoration:none; color:inherit;
+    font-family:"Archivo Black",system-ui,sans-serif; font-size:22px}
+  .arrow{font-size:28px; line-height:1; transform:translateY(-1px)}
+  .section-label{color:var(--muted); font-weight:700; text-transform:lowercase}
+
+  /* === STUCK: ta sama strzałka przypięta względem .container === */
+  .back.stuck{
+    position: fixed;
+    /* lewa krawędź kontenera + jego padding */
+    left: calc( max((100vw - var(--maxw)) / 2, 0px) + clamp(16px, 3vw, 32px) );
+    /* ta sama wysokość co padding kontenera */
+    top:  clamp(16px, 3vw, 32px);
+    z-index: 45; /* lightbox ma 50; zmień na 55, jeśli chcesz nad lightboxem */
+    display: grid; place-items: center;
+    width: 36px; height: 36px;         /* ← rozmiar kwadratu */
+    background: var(--bg); color: var(--fg);
+    border: 1px solid #e5e5e5; border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0,0,0,.08);
+    padding: 0; gap: 0;
+  }
+  /* ukryj wizualnie napis "malepszym" w trybie stuck (A11y zostaje) */
+  .back.stuck span:nth-of-type(2){
+    position:absolute !important; width:1px; height:1px; overflow:hidden; white-space:nowrap;
+    clip:rect(0 0 0 0); clip-path:inset(50%);
+  }
+  /* strzałka zostaje jak była */
+  .back.stuck .arrow{ font-size:24px; transform:none }
+  @media (max-width:700px){
+    .back.stuck{ width:36px; height:36px }
+    .back.stuck .arrow{ font-size:22px }
+  }
+
+  /* page title – bazowe odstępy (nieciasno globalnie) */
   .page-title{
-    /* było: margin: clamp(24px,6vh,48px) 0; */
-    margin: clamp(16px, 4.5vh, 36px) 0 clamp(12px, 3vh, 22px);
+    font-family:"Archivo Black",system-ui,sans-serif;
+    text-align:center; font-size:clamp(44px,10vw,120px);
+    line-height:1.05; margin: clamp(24px,6vh,48px) 0;
+    letter-spacing:1px;
   }
-}
-  </style>
+
+  /* gallery */
+  .gallery{
+    display:grid; gap:var(--gap);
+    grid-template-columns:repeat(3,1fr);
+    align-items:stretch;
+  }
+
+  /* clickable tiles (no default button chrome) */
+  .frame{
+    appearance:none; -webkit-appearance:none;
+    border:0; padding:0; margin:0;
+    background:transparent; line-height:0; cursor:pointer; display:block;
+    position:relative; overflow:hidden; /* dla overlayu */
+    /* Jeśli wszystkie 3 miniatury mają ten sam kadr, możesz włączyć stały stosunek: */
+    /* aspect-ratio: 3 / 4; */
+  }
+  .frame img{
+    display:block; width:100%; height:100%; object-fit:cover;
+    transition:filter .25s ease;
+  }
+  .frame:hover img{ filter:grayscale(100%) contrast(.95) brightness(.98) }
+  .frame:focus-visible{ outline:3px solid #000; outline-offset:6px; border-radius:6px }
+
+  /* meta pod galerią */
+  .project-meta{ text-align:center; margin:clamp(24px,6vh,48px) 0 }
+  .project-title{
+    font-family:"Archivo Black",system-ui,sans-serif;
+    font-size:clamp(36px,6.5vw,72px); line-height:1.08; margin:0 0 6px;
+  }
+  .project-roles{
+    font-family:"Archivo Black",system-ui,sans-serif;
+    font-size:clamp(18px,3vw,28px); margin:0;
+  }
+
+  /* underline dla linków w tytułach */
+  .link-underline{ position:relative; text-decoration:none; color:inherit }
+  .link-underline::after{
+    content:""; position:absolute; left:0; bottom:calc(var(--offset)*-1);
+    height:var(--underline); width:0; background:currentColor; transition:width .25s ease;
+  }
+  .link-underline:hover::after{ width:100% }
+
+  /* odstęp między projektami */
+  .project-block{ margin-top: clamp(40px, 10vh, 80px); }
+
+  /* responsywny YouTube 16:9 */
+  .video-wrap{
+    position:relative; width:100%; aspect-ratio:16/9;
+    background:#000; border-radius:8px; overflow:hidden;
+  }
+  .video-wrap iframe{
+    position:absolute; inset:0; width:100%; height:100%; border:0;
+  }
+
+  /* RWD */
+  @media (max-width:1000px){ .gallery{ grid-template-columns:repeat(2,1fr) } }
+  @media (max-width:640px){ .gallery{ grid-template-columns:1fr } }
+
+  /* LIGHTBOX (modal) */
+  .lightbox{
+    position:fixed; inset:0; z-index:50;
+    display:none; align-items:center; justify-content:center; gap:8px;
+    background:rgba(0,0,0,.75); padding:24px;
+  }
+  .lightbox.open{ display:flex }
+  .lb-track{
+    position:relative; width:min(1200px, 96vw); height:min(86vh, 900px);
+    overflow-x:auto; scroll-snap-type:x mandatory; display:flex; gap:0; background:#111;
+  }
+  .lb-track img{
+    flex:0 0 100%; height:100%; object-fit:contain; scroll-snap-align:center; background:#111;
+  }
+  .lb-btn{
+    appearance:none; border:0; background:rgba(255,255,255,.85); color:#111;
+    width:42px; height:42px; border-radius:999px; font-size:24px; line-height:1;
+    display:inline-grid; place-items:center; cursor:pointer;
+  }
+  .lb-btn:hover{ background:#fff }
+  .lb-close{ position:absolute; top:16px; right:16px }
+  .lb-prev, .lb-next{ align-self:center }
+  .lb-prev{ order:-1 } .lb-next{ order:2 }
+  .no-scroll{ overflow:hidden }
+
+  /* overlay "see more" */
+  .see-more{
+    position:absolute; inset:0; display:grid; place-items:center;
+    color:#fff; font-family:"Archivo Black",system-ui,sans-serif;
+    font-size:clamp(16px,2.2vw,22px); letter-spacing:.5px;
+    text-transform:lowercase;
+    opacity:0; transition:opacity .25s ease; pointer-events:none;
+  }
+  .see-more::before{ content:""; position:absolute; inset:0; background:rgba(0,0,0,.28) }
+  .see-more span{ position:relative; z-index:1 }
+  .frame.has-more:hover .see-more,
+  .frame.has-more:focus-visible .see-more{ opacity:1 }
+
+  /* Pasek miniaturek w lightboxie (desktop) */
+  .lb-thumbs{
+    position:absolute; left:50%; transform:translateX(-50%);
+    bottom:16px;
+    display:flex; gap:10px; padding:8px 10px;
+    background:rgba(0,0,0,.35); border-radius:10px;
+    max-width:96vw; overflow-x:auto; z-index:2;
+    -webkit-overflow-scrolling: touch;
+  }
+  .lb-thumb{
+    appearance:none; border:0; padding:0; margin:0; cursor:pointer;
+    width:clamp(44px, 6vw, 72px); height:clamp(44px, 6vw, 72px);
+    border-radius:6px; overflow:hidden; opacity:.6; outline:2px solid transparent;
+    flex:0 0 auto; background:#000;
+  }
+  .lb-thumb img{ width:100%; height:100%; object-fit:cover; display:block }
+  .lb-thumb.active{ opacity:1; outline-color:#fff }
+  @media (max-width: 900px){ .lb-thumbs{ display:none } }
+
+  /* ===== Scroll reveal ===== */
+  .reveal{
+    opacity:0; transform:translateY(16px);
+    transition:opacity .6s ease, transform .6s ease; will-change:opacity,transform;
+  }
+  .reveal.in{ opacity:1; transform:none }
+  .from-left{ transform:translateX(-24px) }
+  .from-right{ transform:translateX(24px) }
+  .from-bottom{ transform:translateY(16px) }
+  .reveal.in.from-left,.reveal.in.from-right,.reveal.in.from-bottom{ transform:none }
+  .delay-1{ transition-delay:.10s }
+  .delay-2{ transition-delay:.22s }
+  .delay-3{ transition-delay:.34s }
+  .delay-4{ transition-delay:.46s }
+  @media (prefers-reduced-motion:reduce){ .reveal{ opacity:1; transform:none; transition:none } }
+
+  /* footer */
+  footer{ margin-top:auto; border-top:1px solid #e5e5e5 }
+  footer .container{ color:#9aa0a6; font-size:14px }
+
+  /* --- MOBILE LIGHTBOX FIX --- */
+  @media (max-width: 768px){
+    .lightbox{ padding: 8px !important; }
+    .lb-btn{ width:36px; height:36px; font-size:20px }
+    .lb-close{ top:8px; right:8px }
+    .lightbox .lb-track{
+      width: 100vw;
+      height: 70vh !important;
+      height: 70svh !important;
+      height: 70dvh !important;
+    }
+    .lightbox .lb-track img{ width:100%; height:100%; object-fit:contain }
+  }
+  @media (max-width: 380px){
+    .lightbox .lb-track{
+      height: 66vh !important;
+      height: 66svh !important;
+      height: 66dvh !important;
+    }
+  }
+
+  /* Back to top */
+  .to-top{
+    position: fixed;
+    right: clamp(12px, 3vw, 24px);
+    bottom: clamp(12px, 3vw, 24px);
+    width: 48px; height: 48px;
+    border: 0; border-radius: 999px;
+    display: grid; place-items: center;
+    background: var(--fg); color: var(--bg);
+    font-family: "Archivo Black", system-ui, sans-serif;
+    font-size: 22px; line-height: 1;
+    box-shadow: 0 8px 18px rgba(0,0,0,.15);
+    opacity: 0; transform: translateY(12px);
+    pointer-events: none; transition: opacity .25s ease, transform .25s ease;
+    z-index: 45; /* lightbox ma 50 */
+  }
+  .to-top.show{ opacity:1; transform:none; pointer-events:auto }
+  .to-top:hover{ filter:brightness(1.05) }
+  .to-top:focus-visible{ outline:3px solid #000; outline-offset:3px }
+  @media (max-width:640px){ .to-top{ width:56px; height:56px; font-size:24px } }
+
+  /* ===== PRELOADER „mm” ===== */
+  #preloader{
+    position: fixed; inset: 0; z-index: 9999;
+    display: grid; place-items: center;
+    background: var(--bg); color: var(--fg);
+    transition: opacity .4s ease, visibility .4s ease;
+  }
+  #preloader.hidden{ opacity: 0; visibility: hidden }
+
+  #preloader svg{ width: clamp(120px, 26vw, 260px); height: auto }
+  #preloader .mm{
+    font-family: "Archivo Black", system-ui, sans-serif;
+    font-size: 180px; /* skaluje się przez viewBox */
+    fill: transparent;                    /* na start tylko kontur */
+    stroke: currentColor; stroke-width: 10; stroke-linejoin: round;
+    paint-order: stroke fill;             /* najpierw kontur, potem wypełnienie */
+    /* ANIMACJE */
+    stroke-dasharray: 1400;
+    stroke-dashoffset: 1400;
+    animation: mm-draw .7s ease-out forwards, mm-fill .45s ease-out .65s forwards;
+  }
+  @keyframes mm-fill { to { fill: currentColor; } }
+  @keyframes mm-draw { to { stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce){
+    #preloader .mm{
+      animation: mm-fill .2s linear .2s forwards;
+      stroke-dasharray: none; stroke-dashoffset: 0;
+    }
+  }
+
+  /* ===== Project credits (infinite sliding) ===== */
+  .credits{
+    position:relative; overflow:hidden;
+    margin: clamp(6px, 2.5vh, 20px) 0 0;
+  }
+  .credits::before,.credits::after{
+    content:""; position:absolute; top:0; bottom:0; width:64px; pointer-events:none;
+  }
+  .credits::before{ left:0;  background:linear-gradient(to right, var(--bg), transparent); }
+  .credits::after { right:0; background:linear-gradient(to left,  var(--bg), transparent); }
+
+  .credits-track{
+    display:flex; width:max-content; gap:64px;
+    animation: marquee var(--speed, 22s) linear infinite;
+    will-change: transform;
+  }
+  .credits:hover .credits-track{ animation-play-state: paused; }
+
+  .credits-line{
+    white-space:nowrap; color:#9aa0a6; font-style:italic;
+    font-size: clamp(14px, 1.8vw, 22px); letter-spacing:.2px;
+  }
+  @keyframes marquee{
+    from{ transform: translateX(0) }
+    to  { transform: translateX(-50%) }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .credits{ overflow:auto }
+    .credits-track{ animation:none }
+    .credits::before,.credits::after{ display:none }
+  }
+
+  /* footer layout + socials */
+  footer .foot{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; flex-wrap:wrap;
+  }
+  footer .socials{
+    display:flex; align-items:center; gap:10px;
+    color:#9aa0a6; font-size:14px;
+  }
+  footer .socials a{ color:inherit; text-decoration:none }
+  footer .socials a:hover{ text-decoration:underline }
+  footer .socials .sep{ opacity:.6; user-select:none }
+  @media (max-width:520px){
+    footer .foot{ justify-content:center; gap:8px }
+  }
+
+  /* TYLKO DESKTOP – ciaśniej nad i pod tytułem */
+  @media (min-width:701px){
+    main.container{
+      padding-top: clamp(10px, 2vw, 20px);
+    }
+    .page-title{
+      margin: clamp(16px, 4.5vh, 36px) 0 clamp(12px, 3vh, 22px);
+    }
+  }
+</style>
 </head>
 <body>
   <div id="preloader" role="status" aria-live="polite">
