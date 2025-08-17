@@ -84,13 +84,16 @@
   white-space: nowrap;
 }
 
-/* MOBILE: notka na środku pod tytułem (tak jak chcesz) */
+/* MOBILE: notka pod tytułem, idealnie wycentrowana */
 @media (max-width:720px){
+  .title-row{ text-align: center; }           /* centra dla zawartości */
+  .title-wrap{ display: inline-block; }       /* szerokość = szer. tytułu */
+
   .hot-note{
-    right: auto;
-    left: 50%;
-    transform: translateX(-50%);
-    top: calc(100% + 6px);                /* ciut ciaśniej na mobile */
+    position: static;                         /* rezygnujemy z absolute */
+    display: inline-block;
+    margin-top: 8px;                          /* odległość od tytułu */
+    left: auto; right: auto; transform: none; /* na wszelki wypadek */
   }
 }
 
