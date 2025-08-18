@@ -93,31 +93,47 @@
 }
 #preloader.hidden{ opacity: 0; visibility: hidden }
 
-#preloader svg{ width: clamp(120px, 26vw, 260px); height: auto }
+/* litera "mm" – stan bazowy (bez animacji) */
 #preloader .mm{
   font-family: "Archivo Black", system-ui, sans-serif;
-  font-size: 180px; /* skaluje się przez viewBox */
-  fill: transparent;                    /* na start tylko kontur */
+  font-size: 180px;            /* skaluje się przez viewBox */
+  fill: transparent;           /* na start tylko kontur */
   stroke: currentColor; stroke-width: 10; stroke-linejoin: round;
-  paint-order: stroke fill;             /* najpierw kontur, potem wypełnienie */
-  /* ANIMACJE */
-  /* 1) delikatne „rysowanie” konturu (opcjonalne, ale działa w nowoczesnych przeglądarkach) */
+  paint-order: stroke fill;
   stroke-dasharray: 1400;
   stroke-dashoffset: 1400;
-  animation: mm-draw .7s ease-out forwards, mm-fill .45s ease-out .65s forwards;
 }
 
-/* 2) wypełnienie po chwili */
-@keyframes mm-fill { to { fill: currentColor; } }
-/* 1) rysowanie konturu */
-@keyframes mm-draw { to { stroke-dashoffset: 0; } }
+/* gdy ma klasę .loop – gra cyklem w kółko */
+#preloader .mm.loop{
+  animation: mm-seq 2.2s ease-in-out infinite;
+}
 
-/* Szacunek dla reduced motion */
+/* gdy ma klasę .finalize – szybko dorysuj i wypełnij */
+#preloader .mm.finalize{
+  animation: mm-fill-final .35s ease-out forwards;
+}
+
+/* cykl pętli: rysuj kontur → wypełnij → wyczyść → od nowa */
+@keyframes mm-seq{
+  0%   { stroke-dashoffset: 1400; fill: transparent; }
+  40%  { stroke-dashoffset: 0;    fill: transparent; }
+  58%  { fill: currentColor; }
+  72%  { fill: currentColor; }    /* chwila pauzy wypełnione */
+  90%  { fill: transparent; }
+  100% { stroke-dashoffset: 1400; fill: transparent; }
+}
+
+/* jednorazowe domknięcie przy chowaniu */
+@keyframes mm-fill-final{
+  to { stroke-dashoffset: 0; fill: currentColor; }
+}
+
+/* Szacunek dla prefers-reduced-motion: bez pętli, po prostu pokaż pełne */
 @media (prefers-reduced-motion: reduce){
-  #preloader .mm{
-    animation: mm-fill .2s linear .2s forwards;
-    stroke-dasharray: none; stroke-dashoffset: 0;
-  }
+  #preloader .mm{ stroke-dashoffset: 0; fill: currentColor; }
+  #preloader .mm.loop{ animation: none; }
+  #preloader .mm.finalize{ animation: none; }
 }
 /* footer (spójny z contact/work) */
 footer{ margin-top:auto; border-top:1px solid #e5e5e5 }
@@ -167,23 +183,60 @@ footer .socials .sep{ opacity:.6; user-select:none }
   const pre = document.getElementById('preloader');
   if (!pre) return;
 
-  const MIN_SHOW = 450;           // min. czas wyświetlania, żeby nie migało
-  const start = performance.now();
+  const logo = pre.querySelector('.mm');
+  // włącz zapętloną animację od razu
+  logo && logo.classList.add('loop');
 
-  const hide = () => {
+  const MIN_SHOW = 450;   // min. czas pokazywania (ms)
+  const MAX_WAIT = 3500;  // górny limit czekania
+
+  function waitForImage(img){
+    if (img.complete && img.naturalWidth > 0){
+      return img.decode ? img.decode().catch(()=>{}) : Promise.resolve();
+    }
+    return new Promise(res => {
+      img.addEventListener('load', async () => {
+        if (img.decode){ try { await img.decode(); } catch(e){} }
+        res();
+      }, { once:true });
+      img.addEventListener('error', res, { once:true });
+    });
+  }
+
+  (async function init(){
+    const start = performance.now();
+
+    // czekamy na „krytyczne” obrazki + fonty (jak w Twojej wersji)
+    const critical = Array.from(
+      document.querySelectorAll('img.critical, img[loading="eager"][fetchpriority="high"]')
+    );
+    const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+    const imgsReady  = Promise.allSettled(critical.map(waitForImage));
+
+    await Promise.race([
+      Promise.all([fontsReady, imgsReady]),
+      new Promise(r => setTimeout(r, MAX_WAIT))
+    ]);
+
     const elapsed = performance.now() - start;
     const wait = Math.max(0, MIN_SHOW - elapsed);
-    setTimeout(() => {
-      pre.classList.add('hidden');
-      pre.addEventListener('transitionend', () => pre.remove(), { once:true });
-      document.documentElement.classList.add('app-ready');
-    }, wait);
-  };
 
-  window.addEventListener('load', hide);  // chowamy po pełnym załadowaniu
-  setTimeout(hide, 2500);                 // fallback, gdyby load się opóźnił
+    setTimeout(() => {
+      // 1) zatrzymaj pętlę i „dorysuj” do wypełnionego stanu
+      if (logo){
+        logo.classList.remove('loop');
+        logo.classList.add('finalize');
+      }
+      // 2) po krótkim domalowaniu – wygaszamy preloader
+      setTimeout(() => {
+        pre.classList.add('hidden');
+        pre.addEventListener('transitionend', () => pre.remove(), { once:true });
+      }, 380); // dopasowane do .finalize (.35s)
+    }, wait);
+  })();
 })();
 </script>
+
   <footer>
   <div class="container">
     <div class="foot">
