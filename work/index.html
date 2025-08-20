@@ -744,22 +744,6 @@
 </script>
   <script>
 (() => {
-  // Szanujemy reduce motion
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-  const PX_PER_SEC = 80;           // docelowa prędkość (px/s) – zmień wg uznania
-  const MIN_SEC   = 12;            // dolny limit, żeby nie było zbyt szybko
-
-  function normalizeCreditsSpeed(){
-    document.querySelectorAll('.credits').forEach(c=>{
-      const track = c.querySelector('.credits-track');
-      if(!track) return;
-      // Pętla jest bezszwowa co 50% własnej szerokości:
-      const distance = track.scrollWidth / 2;    // px
-      const duration = Math.max(MIN_SEC, distance / PX_PER_SEC); // s
-      track.style.setProperty('--speed', `${duration}s`);
-    });
-  }
 
   // Po załadowaniu fontów, żeby szerokość była poprawna
   (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve())
@@ -767,6 +751,64 @@
 
   // Aktualizuj przy zmianie rozmiaru
   window.addEventListener('resize', normalizeCreditsSpeed);
+})();
+</script>
+  <script>
+(() => {
+  // bez animacji – nic nie rób
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const PX_PER_SEC = 80;   // docelowa prędkość (px/s)
+  const MIN_SEC    = 12;   // minimalny czas cyklu, żeby nie było zbyt szybko
+
+  function buildCredits(c){
+    const track = c.querySelector('.credits-track');
+    if(!track) return;
+
+    // zapamiętaj bazowy element (pierwszą linię) raz
+    if(!track.dataset.base){
+      const first = track.querySelector('.credits-line');
+      if(!first) return;
+      track.dataset.base = first.outerHTML;
+    }
+    const base = track.dataset.base;
+
+    // odbuduj tor od zera
+    track.innerHTML = '';
+
+    // tyle chcemy mieć łącznie: > 2× szerokość kontenera, żeby 0→-50% było bezszwowe
+    const target = c.clientWidth * 2.2;
+
+    let guard = 0;
+    do{
+      track.insertAdjacentHTML('beforeend', base);
+      guard++;
+      if(guard > 30) break;        // bezpiecznik
+    } while (track.scrollWidth < target);
+
+    // upewnij się, że liczba segmentów jest PARZYSTA (połówki identyczne)
+    if (track.children.length % 2 !== 0) {
+      track.insertAdjacentHTML('beforeend', base);
+    }
+
+    // przelicz prędkość: dystans pętli to połowa toru
+    const distance = track.scrollWidth / 2;          // px
+    const duration = Math.max(MIN_SEC, distance / PX_PER_SEC); // s
+    track.style.setProperty('--speed', `${duration}s`);
+  }
+
+  function init(){
+    document.querySelectorAll('.credits').forEach(buildCredits);
+  }
+
+  // po załadowaniu fontów (żeby pomiary szerokości były prawidłowe)
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve())
+    .then(init);
+
+  // przy zmianie rozmiaru – odbuduj z zapamiętanego "base"
+  window.addEventListener('resize', () => {
+    document.querySelectorAll('.credits').forEach(buildCredits);
+  });
 })();
 </script>
 </body>
