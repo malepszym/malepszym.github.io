@@ -588,7 +588,7 @@
       document.body.classList.add('no-scroll');
       requestAnimationFrame(()=>{
         const w = track.clientWidth;
-        track.scrollTo({ left: w * index, behavior: 'instant' });
+        track.scrollTo({ left: w * index, behavior: 'auto' });
         track.focus({ preventScroll: true });
         updateThumbsActive();
       });
@@ -599,13 +599,17 @@
       group = null;
     }
     function go(delta){
-      if(!group) return;
-      const count = IMAGES[group].length;
-      index = (index + delta + count) % count;
-      const w = track.clientWidth;
-      track.scrollTo({ left: w * index, behavior: 'smooth' });
-      updateThumbsActive();
-    }
+  if(!group) return;
+  const count = IMAGES[group].length;
+  const prev = index;
+  index = (index + delta + count) % count;
+
+  const w = track.clientWidth;
+  const isWrap = (prev === count - 1 && index === 0) || (prev === 0 && index === count - 1);
+  track.scrollTo({ left: w * index, behavior: isWrap ? 'auto' : 'smooth' });
+
+  updateThumbsActive();
+}
 
     // Miniatury + overlay "see more"
     document.querySelectorAll('.frame').forEach(btn=>{
@@ -635,12 +639,12 @@
     btnNext.addEventListener('click', ()=>go(1));
     btnClose.addEventListener('click', closeLightbox);
     overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeLightbox(); });
-    window.addEventListener('keydown', (e)=>{
-      if(!overlay.classList.contains('open')) return;
-      if(e.key === 'Escape') closeLightbox();
-      if(e.key === 'ArrowRight') go(1);
-      if(e.key === 'ArrowLeft')  go(-1);
-    });
+   window.addEventListener('keydown', (e)=>{
+  if(!overlay.classList.contains('open')) return;
+  if(e.key === 'Escape'){ e.preventDefault(); closeLightbox(); return; }
+  if(e.key === 'ArrowRight'){ e.preventDefault(); go(1); }
+  if(e.key === 'ArrowLeft'){  e.preventDefault(); go(-1); }
+});
 
     // Aktualizacja indexu przy ręcznym scrollu
     let timer;
