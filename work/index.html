@@ -118,6 +118,20 @@
     font-size:clamp(18px,3vw,28px); margin:0;
   }
 
+    /* link "more" pod rolą */
+.project-more{
+  display:inline-block;
+  margin-top:6px;
+  color:#9aa0a6;                         /* szary */
+  font-family:"Archivo Black",system-ui,sans-serif;
+  font-size:14px;
+  text-transform:lowercase;
+  letter-spacing:.3px;
+  text-decoration:none;                  /* podkreślenie robi klasa link-underline */
+}
+/* delikatne podbicie na hover (opcjonalnie) */
+.project-more:hover{ filter:brightness(1.05); }
+    
   /* underline dla linków w tytułach */
   .link-underline{ position:relative; text-decoration:none; color:inherit }
   .link-underline::after{
@@ -412,6 +426,7 @@
           <a class="link-underline" href="https://www.instagram.com/remains.official" target="_blank" rel="noopener noreferrer">Remains</a>
         </h2>
         <p class="project-roles">styling · communications lead </p>
+        <a class="project-more link-underline" href="/work/remains/">more</a>
       </section>
       <div class="credits reveal from-bottom" aria-label="Project credits">
   <div class="credits-track" style="--speed: 24s;">
