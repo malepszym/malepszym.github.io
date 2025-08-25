@@ -30,7 +30,10 @@
     .case-title{ font-family:"Archivo Black",system-ui,sans-serif; text-align:center;
                  font-size:clamp(44px,10vw,120px); line-height:1.05; margin:clamp(20px,6vh,40px) 0 8px; letter-spacing:1px; }
 
-    .case-meta{ text-align:center; margin-bottom: clamp(10px,3vh,20px); }
+    .case-meta{
+  text-align:center;
+  margin: clamp(10px, 2vh, 18px) 0 0;  /* zamiast margin-bottom */
+}
     .case-role{
       font-family:"Archivo Black",system-ui,sans-serif;
       font-size:clamp(18px,3vw,28px); line-height:1.1; margin:0 0 8px;
@@ -101,27 +104,17 @@
     <span class="section-label">work</span>
   </header>
 
-  <main class="container">
-    <h1 class="case-title">kajamann.clothing</h1>
-
-    <section class="case-meta">
-      <p class="case-role">styling · creative assistant</p>
-      <p class="case-desc">
-        for the Resort ‘24 collection shoot, i styled the looks – pairing outfits with the right models,
-        curating hair and makeup, and choosing locations that amplified the clothes. beyond styling, i supported
-        the designer and photographer on set, making sure the creative direction was consistent and the vision
-        translated across every frame.
-      </p>
-    </section>
-
-    <!-- main 3 assets -->
+<main class="container">
+  <h1 class="case-title">kajamann.clothing</h1>
+  
+<!-- main 3 assets -->
     <div class="gallery">
       <button class="frame" type="button" data-index="0" aria-label="Open image 1"><img src="/assets/work/4.svg" alt=""></button>
       <button class="frame" type="button" data-index="1" aria-label="Open image 2"><img src="/assets/work/5.svg" alt=""></button>
       <button class="frame" type="button" data-index="2" aria-label="Open image 3"><img src="/assets/work/6.svg" alt=""></button>
     </div>
-
-    <!-- thumbs for all 7 -->
+  
+  <!-- thumbs for all 7 -->
     <div class="thumbs" aria-label="All images">
       <button class="thumb" type="button" data-index="0" aria-label="Show 4"><img src="/assets/work/4.svg" alt=""></button>
       <button class="thumb" type="button" data-index="1" aria-label="Show 5"><img src="/assets/work/5.svg" alt=""></button>
@@ -131,6 +124,16 @@
       <button class="thumb" type="button" data-index="5" aria-label="Show km6"><img src="/assets/work/km6.svg" alt=""></button>
       <button class="thumb" type="button" data-index="6" aria-label="Show km7"><img src="/assets/work/km7.svg" alt=""></button>
     </div>
+  
+    <section class="case-meta">
+      <p class="case-role">styling · creative assistant</p>
+      <p class="case-desc">
+        for the Resort ‘24 collection shoot, i styled the looks – pairing outfits with the right models,
+        curating hair and makeup, and choosing locations that amplified the clothes. beyond styling, i supported
+        the designer and photographer on set, making sure the creative direction was consistent and the vision
+        translated across every frame.
+      </p>
+    </section>
 
     <!-- credits -->
     <div class="credits" aria-label="Project credits">
