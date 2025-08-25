@@ -244,22 +244,63 @@
       }, 80);
     });
 
-    // credits auto-speed based on width
-    (function(){
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      const PX_PER_SEC = 80, MIN_SEC = 12;
-      function normalize(){
-        document.querySelectorAll('.credits').forEach(c=>{
-          const tr = c.querySelector('.credits-track');
-          if(!tr) return;
-          const dist = tr.scrollWidth / 2;
-          const dur  = Math.max(MIN_SEC, dist / PX_PER_SEC);
-          tr.style.setProperty('--speed', dur + 's');
-        });
-      }
-      (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(normalize);
-      window.addEventListener('resize', normalize);
-    })();
+    <script>
+(() => {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const PX_PER_SEC = 80;   // docelowa prędkość (px/s)
+  const MIN_SEC    = 12;   // min czas cyklu
+
+  function buildCredits(c){
+    const track = c.querySelector('.credits-track');
+    if(!track) return;
+
+    // zapisz bazową linię tylko raz
+    if(!track.dataset.base){
+      const first = track.querySelector('.credits-line');
+      if(!first) return;
+      track.dataset.base = first.outerHTML;
+    }
+    const base = track.dataset.base;
+
+    // odbuduj tor od zera
+    track.innerHTML = '';
+
+    // celem jest >2× szerokość kontenera — wtedy animacja 0→-50% jest bezszwowa
+    const target = c.clientWidth * 2.2;
+    let guard = 0;
+    do{
+      track.insertAdjacentHTML('beforeend', base);
+      guard++;
+      if(guard > 30) break;      // bezpiecznik
+    } while (track.scrollWidth < target);
+
+    // zadbaj o liczbę elementów parzystą (dwie identyczne połówki)
+    if (track.children.length % 2 !== 0) {
+      track.insertAdjacentHTML('beforeend', base);
+    }
+
+    // prędkość z długości toru (połowa to dystans pętli)
+    const distance = track.scrollWidth / 2;
+    const duration = Math.max(MIN_SEC, distance / PX_PER_SEC);
+    track.style.setProperty('--speed', `${duration}s`);
+  }
+
+  function init(){
+    document.querySelectorAll('.credits').forEach(buildCredits);
+  }
+
+  // po załadowaniu fontów — żeby pomiary były poprawne
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve())
+    .then(init);
+
+  // przy zmianie rozmiaru — odbuduj z zachowanej bazy
+  window.addEventListener('resize', () => {
+    document.querySelectorAll('.credits').forEach(buildCredits);
+  });
+})();
+</script>
+
   </script>
 </body>
 </html>
