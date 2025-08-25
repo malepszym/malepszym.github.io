@@ -118,19 +118,18 @@
     font-size:clamp(18px,3vw,28px); margin:0;
   }
 
-    /* link "more" pod rolą */
-.project-more{
+   /* link "more" pod rolą — na środku, ciemnoszary i trochę większy */
+.project-meta a.project-more{
   display:inline-block;
-  margin-top:6px;
-  color:#9aa0a6;                         /* szary */
+  margin-top:8px;
   font-family:"Archivo Black",system-ui,sans-serif;
-  font-size:14px;
+  font-size: clamp(15px, 1.4vw, 17px);
+  color:#6d6d6d;                 /* ciemnoszary */
   text-transform:lowercase;
   letter-spacing:.3px;
-  text-decoration:none;                  /* podkreślenie robi klasa link-underline */
+  text-decoration:none;          /* underline robi .link-underline */
 }
-/* delikatne podbicie na hover (opcjonalnie) */
-.project-more:hover{ filter:brightness(1.05); }
+.project-meta a.project-more:hover{ filter:brightness(1.06); }
     
   /* underline dla linków w tytułach */
   .link-underline{ position:relative; text-decoration:none; color:inherit }
