@@ -4,6 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Remains — malepszym</title>
+  <!-- Favicons -->
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<meta name="theme-color" content="#eeeeee">
+
 
   <!-- SEO / share -->
   <link rel="canonical" href="https://malepszym.github.io/work/remains/">
@@ -99,10 +105,46 @@
   margin:0 0 6px;
   text-align:center; /* jeśli chcesz centralnie */
 }
+/* === PRELOADER === */
+#preloader{
+  position:fixed; inset:0; z-index:9999;
+  display:grid; place-items:center;
+  background:var(--bg); color:var(--fg);
+  transition:opacity .4s ease, visibility .4s ease;
+}
+#preloader.hidden{ opacity:0; visibility:hidden }
+#preloader svg{ width:clamp(120px,26vw,260px); height:auto; display:block }
+#preloader .mm{
+  font-family:"Archivo Black",system-ui,sans-serif;
+  font-size:180px; fill:transparent;
+  stroke:currentColor; stroke-width:10; stroke-linejoin:round;
+  paint-order:stroke fill;
+  stroke-dasharray:1400; stroke-dashoffset:1400;
+}
+#preloader .mm.loop{ animation:mm-seq 2.2s ease-in-out infinite }
+#preloader .mm.finalize{ animation:mm-fill-final .35s ease-out forwards }
+@keyframes mm-seq{
+  0%{stroke-dashoffset:1400; fill:transparent}
+  40%{stroke-dashoffset:0;    fill:transparent}
+  58%,72%{fill:currentColor}
+  90%,100%{fill:transparent}
+  100%{stroke-dashoffset:1400}
+}
+@keyframes mm-fill-final{ to{ stroke-dashoffset:0; fill:currentColor } }
+@media (prefers-reduced-motion:reduce){
+  #preloader .mm{ stroke-dashoffset:0; fill:currentColor }
+  #preloader .mm.loop,#preloader .mm.finalize{ animation:none }
+}
 
   </style>
 </head>
 <body>
+  <div id="preloader" role="status" aria-live="polite">
+  <svg viewBox="0 0 600 240" aria-label="Loading">
+    <text x="50%" y="58%" text-anchor="middle" class="mm">mm</text>
+  </svg>
+</div>
+
   <header class="container top">
     <a class="back" href="/work/" aria-label="Back to work"><span class="arrow">←</span><span>malepszym</span></a>
     <span class="section-label">work</span>
@@ -255,5 +297,55 @@
       window.addEventListener('resize', normalize);
     })();
   </script>
+  <script>
+(() => {
+  const pre = document.getElementById('preloader');
+  if (!pre) return;
+  const logo = pre.querySelector('.mm');
+  logo && logo.classList.add('loop');
+
+  const MIN_SHOW = 450;   // ms – min czas pokazywania
+  const MAX_WAIT = 3500;  // ms – safety timeout
+
+  function waitForImage(img){
+    if (img.complete && img.naturalWidth > 0){
+      return img.decode ? img.decode().catch(()=>{}) : Promise.resolve();
+    }
+    return new Promise(res=>{
+      img.addEventListener('load', async ()=>{
+        if (img.decode){ try{ await img.decode(); }catch(e){} }
+        res();
+      }, {once:true});
+      img.addEventListener('error', res, {once:true});
+    });
+  }
+
+  (async function init(){
+    const start = performance.now();
+
+    // Na case page traktujemy 3 główne obrazki w galerii jako „krytyczne”
+    const criticalImgs = Array.from(document.querySelectorAll('.gallery img')).slice(0,3);
+    const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+    const imgsReady  = Promise.allSettled(criticalImgs.map(waitForImage));
+
+    await Promise.race([
+      Promise.all([fontsReady, imgsReady]),
+      new Promise(r => setTimeout(r, MAX_WAIT))
+    ]);
+
+    const elapsed = performance.now() - start;
+    const wait = Math.max(0, MIN_SHOW - elapsed);
+
+    setTimeout(() => {
+      if (logo){ logo.classList.remove('loop'); logo.classList.add('finalize'); }
+      setTimeout(() => {
+        pre.classList.add('hidden');
+        pre.addEventListener('transitionend', () => pre.remove(), { once:true });
+      }, 380);
+    }, wait);
+  })();
+})();
+</script>
+
 </body>
 </html>
