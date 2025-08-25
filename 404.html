@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>404 — malepszym</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#eee; --fg:#111; --muted:#bfbfbf;
+      --underline:3px; --offset:6px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+
+    body{
+      margin:0; background:var(--bg); color:var(--fg);
+      font-family: Inter, system-ui, Arial, sans-serif;
+      display:grid; place-items:center;
+    }
+
+    .wrap{ text-align:center; padding:32px }
+
+    .code{
+      font-family:"Archivo Black", system-ui, sans-serif;
+      font-size: clamp(64px, 14vw, 200px);
+      line-height:1; margin:0 0 10px;
+      letter-spacing:1px;
+    }
+
+    .sub a{
+      font-family:"Archivo Black", system-ui, sans-serif;
+      font-size: clamp(14px, 2.8vw, 26px);
+      color: var(--muted);
+      text-decoration:none; position:relative;
+      /* delikatny „outline” jak na wizualizacji */
+      -webkit-text-stroke: 1px var(--fg);
+      text-shadow: 0 0 0 var(--fg); /* prosty fallback */
+    }
+    .sub a::after{
+      content:""; position:absolute; left:0;
+      bottom: calc(var(--offset) * -1);
+      height: var(--underline); width:0;
+      background: currentColor; transition: width .25s ease;
+    }
+    .sub a:hover::after{ width:100% }
+
+    @media (prefers-reduced-motion: reduce){
+      .sub a::after{ transition:none }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap" aria-label="page not found">
+    <h1 class="code">404</h1>
+    <div class="sub">
+      <a href="/">wanna get out of here?</a>
+    </div>
+  </main>
+</body>
+</html>
