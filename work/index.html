@@ -390,18 +390,21 @@
       margin: clamp(16px, 4.5vh, 36px) 0 clamp(12px, 3vh, 22px);
     }
   }
-    /* "more" pod tytułem projektu – małe, ciemnoszare, underline na hover */
-.project-meta a.more,
-.project-meta a.more:link,
-.project-meta a.more:visited{
+   /* "more" – jednakowy wygląd dla wszystkich projektów */
+.project-meta a.project-more,
+.project-meta a.more {                     /* alias, gdyby gdzieś zostało .more */
   display:inline-block;
-  margin-top:6px;
-  font-size:14px;
-  color:#9aa0a6;         /* ciemnoszare */
+  margin-top:8px;
+  font-family:"Archivo Black", system-ui, sans-serif;
+  font-size:clamp(15px, 1.4vw, 17px);
+  color:#6d6d6d;                           /* ciemnoszary */
+  text-transform:lowercase;
+  letter-spacing:.3px;
   text-decoration:none;
-  letter-spacing:.2px;
 }
+.project-meta a.project-more:hover,
 .project-meta a.more:hover,
+.project-meta a.project-more:focus,
 .project-meta a.more:focus{
   text-decoration:underline;
 }
@@ -470,7 +473,7 @@
           <a class="link-underline" href="https://www.instagram.com/kajamann.clothing/" target="_blank" rel="noopener noreferrer">kajamann.clothing</a>
         </h2>
         <p class="project-roles">styling · creative assistant</p>
-<a class="more" href="/kajamanclothing/" aria-label="More about kajamann.clothing">more</a>
+<a class="project-more link-underline" href="/kajamanclothing/" aria-label="More about kajamann.clothing">more</a>
       </section>
       <div class="credits reveal from-bottom" aria-label="Project credits">
   <div class="credits-track" style="--speed: 24s;">
