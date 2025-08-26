@@ -118,26 +118,34 @@
     font-size:clamp(18px,3vw,28px); margin:0;
   }
 
-   /* link "more" pod rolą — na środku, ciemnoszary i trochę większy */
+ /* "learn more" pod tytułem projektu – JEDEN wspólny styl */
+.project-meta a.more,
 .project-meta a.project-more{
   display:inline-block;
   margin-top:8px;
   font-family:"Archivo Black",system-ui,sans-serif;
   font-size: clamp(15px, 1.4vw, 17px);
-  color:#6d6d6d;                 /* ciemnoszary */
-  text-transform:lowercase;
+  color:#6d6d6d;            /* ciemnoszary */
+  text-decoration:none;     /* wyłącz domyślne podkreślenie */
   letter-spacing:.3px;
-  text-decoration:none;          /* underline robi .link-underline */
 }
-.project-meta a.project-more:hover{ filter:brightness(1.06); }
-    
-  /* underline dla linków w tytułach */
-  .link-underline{ position:relative; text-decoration:none; color:inherit }
-  .link-underline::after{
-    content:""; position:absolute; left:0; bottom:calc(var(--offset)*-1);
-    height:var(--underline); width:0; background:currentColor; transition:width .25s ease;
-  }
-  .link-underline:hover::after{ width:100% }
+
+/* nawet na hover NIE używamy text-decoration – kreskę rysuje .link-underline */
+.project-meta a.more:hover,
+.project-meta a.more:focus,
+.project-meta a.project-more:hover,
+.project-meta a.project-more:focus{
+  text-decoration:none;
+}
+
+/* zostaje Twój animowany underline */
+.link-underline{ position:relative; text-decoration:none; color:inherit }
+.link-underline::after{
+  content:""; position:absolute; left:0; bottom:calc(var(--offset)*-1);
+  height:var(--underline); width:0; background:currentColor; transition:width .25s ease;
+}
+.link-underline:hover::after{ width:100% }
+
 
   /* odstęp między projektami */
   .project-block{ margin-top: clamp(40px, 10vh, 80px); }
@@ -444,7 +452,7 @@
           <a class="link-underline" href="https://www.instagram.com/remains.official" target="_blank" rel="noopener noreferrer">Remains</a>
         </h2>
         <p class="project-roles">styling · communications lead </p>
-        <a class="project-more link-underline" href="/work/remains/">more</a>
+        <a class="more link-underline" href="/work/remains/">learn more</a>
       </section>
       <div class="credits reveal from-bottom" aria-label="Project credits">
   <div class="credits-track" style="--speed: 24s;">
@@ -473,7 +481,7 @@
           <a class="link-underline" href="https://www.instagram.com/kajamann.clothing/" target="_blank" rel="noopener noreferrer">kajamann.clothing</a>
         </h2>
         <p class="project-roles">styling · creative assistant</p>
-<a class="project-more link-underline" href="/work/kajamannclothing/" aria-label="More about kajamann.clothing">more</a>
+<a class="more link-underline" href="/work/kajamannclothing/">learn more</a>
       </section>
       <div class="credits reveal from-bottom" aria-label="Project credits">
   <div class="credits-track" style="--speed: 24s;">
