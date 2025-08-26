@@ -398,24 +398,33 @@
       margin: clamp(16px, 4.5vh, 36px) 0 clamp(12px, 3vh, 22px);
     }
   }
-   /* "more" – jednakowy wygląd dla wszystkich projektów */
-.project-meta a.project-more,
-.project-meta a.more {                     /* alias, gdyby gdzieś zostało .more */
+  /* "learn more" pod tytułem projektu – JEDEN wspólny styl */
+.project-meta a.more,
+.project-meta a.project-more{
   display:inline-block;
   margin-top:8px;
-  font-family:"Archivo Black", system-ui, sans-serif;
-  font-size:clamp(15px, 1.4vw, 17px);
-  color:#6d6d6d;                           /* ciemnoszary */
-  text-transform:lowercase;
+  font-family:"Archivo Black",system-ui,sans-serif;
+  font-size: clamp(15px, 1.4vw, 17px);
+  color:#6d6d6d;
+  text-decoration:none;     /* wyłącz klasyczne podkreślenie */
   letter-spacing:.3px;
+}
+/* na hover NIE używamy text-decoration – kreskę rysuje .link-underline */
+.project-meta a.more:hover,
+.project-meta a.more:focus,
+.project-meta a.project-more:hover,
+.project-meta a.project-more:focus{
   text-decoration:none;
 }
-.project-meta a.project-more:hover,
-.project-meta a.more:hover,
-.project-meta a.project-more:focus,
-.project-meta a.more:focus{
-  text-decoration:underline;
+
+/* animowany underline */
+.link-underline{ position:relative; text-decoration:none; color:inherit }
+.link-underline::after{
+  content:""; position:absolute; left:0; bottom:calc(var(--offset)*-1);
+  height:var(--underline); width:0; background:currentColor; transition:width .25s ease;
 }
+.link-underline:hover::after{ width:100% }
+
 
 </style>
 </head>
