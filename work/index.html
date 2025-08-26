@@ -425,6 +425,29 @@
 }
 .link-underline:hover::after{ width:100% }
 
+    /* kill native underline for custom underline links */
+.link-underline,
+.link-underline:link,
+.link-underline:visited,
+.link-underline:hover,
+.link-underline:focus,
+.link-underline:active{
+  text-decoration: none !important;
+  -webkit-text-decoration: none !important;  /* Safari */
+  text-decoration-color: transparent !important;
+  border-bottom: 0 !important;
+  background-image: none !important;
+}
+
+/* zostaje tylko nasza kreska z ::after */
+.link-underline::after{
+  content:"";
+  position:absolute; left:0; bottom:calc(var(--offset)*-1);
+  height:var(--underline); width:0; background:currentColor;
+  transition:width .25s ease;
+}
+.link-underline:hover::after{ width:100%; }
+
 
 </style>
 </head>
