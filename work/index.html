@@ -109,8 +109,8 @@
 
     /* pływanie obrazków w galerii (parallax drift) */
 .gallery .frame img{
-  transform: translate3d(0, var(--float, 0px), 0);
-  will-change: transform;           /* GPU & płynniej */
+  will-change: transform;
+  transform: translate3d(0,0,0); /* baseline, JS nadpisze inline */
 }
     
   /* meta pod galerią */
@@ -897,62 +897,59 @@
 </script>
   <script>
 (() => {
-  // Wyłącz efekt dla osób z reduce-motion
+  // szacunek dla prefers-reduced-motion
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const imgs = Array.from(document.querySelectorAll('.gallery .frame img'));
   if (!imgs.length) return;
 
-  const state = new Map();
+  const meta = new Map();
 
   function measure() {
     const midX = window.innerWidth / 2;
     const isMobile = window.matchMedia('(max-width:700px)').matches;
 
-    imgs.forEach((img, i) => {
+    imgs.forEach(img => {
       const r = img.getBoundingClientRect();
       const centerX = r.left + r.width / 2;
 
-      // Kierunek: lewa kolumna w górę (ujemny), prawa w dół (dodatni)
-      // Środkowa (gdy jest) trochę mocniejsza
+      // lewa kolumna w górę, prawa w dół
       const dir = centerX < midX ? -1 : 1;
+      // środkowe kafelki trochę mocniej
       const midBoost = Math.abs(centerX - midX) < (r.width * 0.75) ? 1.35 : 1.0;
 
-      // Bazowa siła (px) – możesz zmieniać pod swój gust
-      let strength = 130 * midBoost;
-      if (isMobile) strength *= 0.45; // delikatniej na telefonie
+      let strength = 140 * midBoost;      // <<— większa liczba = mocniejszy efekt
+      if (isMobile) strength *= 0.5;      // delikatniej na tel.
 
-      state.set(img, { dir, strength });
+      meta.set(img, { dir, strength, y: 0 });
     });
   }
 
   let ticking = false;
-
   function onScroll() {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(update);
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
   }
 
   function update() {
     const vh = window.innerHeight;
 
-    imgs.forEach((img) => {
-      const s = state.get(img);
+    imgs.forEach(img => {
+      const s = meta.get(img);
       if (!s) return;
 
       const r = img.getBoundingClientRect();
-      // Odległość środka obrazka od środka viewportu w przedziale mniej więcej -1..1
+      // od -1 (wysoko nad środkiem) do +1 (daleko pod środkiem)
       const dist = (r.top + r.height / 2 - vh / 2) / vh;
 
-      // Docelowe przesunięcie
       const target = s.dir * dist * s.strength;
+      // lekkie wygładzenie (lerp)
+      s.y += (target - s.y) * 0.10;
 
-      // Lerp (wygładzenie)
-      const current = parseFloat(getComputedStyle(img).getPropertyValue('--float')) || 0;
-      const next = current + (target - current) * 0.08;
-
-      img.style.setProperty('--float', next.toFixed(2) + 'px');
+      // bezpośrednio nadpisujemy transform – zero zmiennych CSS
+      img.style.transform = `translate3d(0, ${s.y.toFixed(2)}px, 0)`;
     });
 
     ticking = false;
@@ -962,9 +959,10 @@
   window.addEventListener('resize', () => { measure(); onScroll(); }, { passive: true });
 
   measure();
-  onScroll();  // pierwszy „kadr”
+  onScroll(); // pierwszy kadr
 })();
 </script>
+
 
 </body>
 </html>
