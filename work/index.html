@@ -919,7 +919,7 @@
       const midBoost = Math.abs(centerX - midX) < (r.width * 0.75) ? 1.35 : 1.0;
 
       // Bazowa siła (px) – możesz zmieniać pod swój gust
-      let strength = 90 * midBoost;
+      let strength = 130 * midBoost;
       if (isMobile) strength *= 0.45; // delikatniej na telefonie
 
       state.set(img, { dir, strength });
