@@ -107,6 +107,12 @@
   .frame:hover img{ filter:grayscale(100%) contrast(.95) brightness(.98) }
   .frame:focus-visible{ outline:3px solid #000; outline-offset:6px; border-radius:6px }
 
+    /* pływanie obrazków w galerii (parallax drift) */
+.gallery .frame img{
+  transform: translate3d(0, var(--float, 0px), 0);
+  will-change: transform;           /* GPU & płynniej */
+}
+    
   /* meta pod galerią */
   .project-meta{ text-align:center; margin:clamp(24px,6vh,48px) 0 }
   .project-title{
@@ -889,5 +895,76 @@
   });
 })();
 </script>
+  <script>
+(() => {
+  // Wyłącz efekt dla osób z reduce-motion
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const imgs = Array.from(document.querySelectorAll('.gallery .frame img'));
+  if (!imgs.length) return;
+
+  const state = new Map();
+
+  function measure() {
+    const midX = window.innerWidth / 2;
+    const isMobile = window.matchMedia('(max-width:700px)').matches;
+
+    imgs.forEach((img, i) => {
+      const r = img.getBoundingClientRect();
+      const centerX = r.left + r.width / 2;
+
+      // Kierunek: lewa kolumna w górę (ujemny), prawa w dół (dodatni)
+      // Środkowa (gdy jest) trochę mocniejsza
+      const dir = centerX < midX ? -1 : 1;
+      const midBoost = Math.abs(centerX - midX) < (r.width * 0.75) ? 1.35 : 1.0;
+
+      // Bazowa siła (px) – możesz zmieniać pod swój gust
+      let strength = 70 * midBoost;
+      if (isMobile) strength *= 0.45; // delikatniej na telefonie
+
+      state.set(img, { dir, strength });
+    });
+  }
+
+  let ticking = false;
+
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(update);
+  }
+
+  function update() {
+    const vh = window.innerHeight;
+
+    imgs.forEach((img) => {
+      const s = state.get(img);
+      if (!s) return;
+
+      const r = img.getBoundingClientRect();
+      // Odległość środka obrazka od środka viewportu w przedziale mniej więcej -1..1
+      const dist = (r.top + r.height / 2 - vh / 2) / vh;
+
+      // Docelowe przesunięcie
+      const target = s.dir * dist * s.strength;
+
+      // Lerp (wygładzenie)
+      const current = parseFloat(getComputedStyle(img).getPropertyValue('--float')) || 0;
+      const next = current + (target - current) * 0.08;
+
+      img.style.setProperty('--float', next.toFixed(2) + 'px');
+    });
+
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', () => { measure(); onScroll(); }, { passive: true });
+
+  measure();
+  onScroll();  // pierwszy „kadr”
+})();
+</script>
+
 </body>
 </html>
