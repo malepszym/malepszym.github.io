@@ -91,16 +91,6 @@
     align-items:stretch;
   }
 
-    /* kafelki muszą mieć wysokość, bo obraz będzie absolutny */
-.gallery .frame{
-  position: relative;       /* już masz, ale dodanie nie zaszkodzi */
-  overflow: hidden;         /* już masz */
-  aspect-ratio: 3 / 4;      /* ← nadaje wysokość (zmień np. na 4/5, jeśli wolisz) */
-}
-
-/* jedna wspólna zmienna przesunięcia dla całej galerii */
-.gallery{ --float: 0px; }
-    
   /* clickable tiles (no default button chrome) */
   .frame{
     appearance:none; -webkit-appearance:none;
@@ -117,44 +107,6 @@
   .frame:hover img{ filter:grayscale(100%) contrast(.95) brightness(.98) }
   .frame:focus-visible{ outline:3px solid #000; outline-offset:6px; border-radius:6px }
 
-/* obraz „przyklejony” do kadru + lekki bleed, żeby nie było prześwitów przy ruchu */
-.gallery .frame img{
-  position: absolute;
-  left: 0; right: 0;
-  top: -6vh;                 /* bleed do góry */
-  height: calc(100% + 12vh); /* i do dołu */
-  width: 100%;
-  object-fit: cover;
-
-  transition: filter .25s ease;
-  transform: translate3d(0, var(--float), 0); /* wspólny drift */
-  will-change: transform;
-}
-
-
-    /* parallax – ile maksymalnie przesuwamy (JS to nadpisze) */
-:root{ --parallax-pad: 80px; }   /* fallback */
-
-.gallery .frame{ position:relative; overflow:hidden; }
-
-/* obraz jest większy o 2×pad i ustawiony absolutnie, więc ruch nie odsłania tła */
-.gallery .frame img{
-  position:absolute; left:0;
-  top: calc(var(--parallax-pad) * -1);
-  width:100%;
-  height: calc(100% + (var(--parallax-pad) * 2));
-  object-fit:cover;
-  will-change: transform;
-  transform: translate3d(0, var(--parallax-y, 0), 0);
-}
-
-/* filtr na hover dalej działa */
-.frame:hover img{ filter:grayscale(100%) contrast(.95) brightness(.98) }
-
-/* overlay zostaje przyklejony do ramki */
-.see-more{ position:absolute; inset:0; }
-
-    
   /* meta pod galerią */
   .project-meta{ text-align:center; margin:clamp(24px,6vh,48px) 0 }
   .project-title{
@@ -243,7 +195,6 @@
     font-size:clamp(16px,2.2vw,22px); letter-spacing:.5px;
     text-transform:lowercase;
     opacity:0; transition:opacity .25s ease; pointer-events:none;
-    transform: translate3d(0, var(--float), 0); /* porusza się razem ze zdjęciem */
   }
   .see-more::before{ content:""; position:absolute; inset:0; background:rgba(0,0,0,.28) }
   .see-more span{ position:relative; z-index:1 }
@@ -872,98 +823,71 @@
   <script>
 (() => {
 
+  // Po załadowaniu fontów, żeby szerokość była poprawna
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve())
+    .then(normalizeCreditsSpeed);
+
   // Aktualizuj przy zmianie rozmiaru
   window.addEventListener('resize', normalizeCreditsSpeed);
 })();
 </script>
   <script>
 (() => {
-  // Szanuj preferencje użytkownika
+  // bez animacji – nic nie rób
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  const galleries = Array.from(document.querySelectorAll('.project-block .gallery'));
-  if (!galleries.length) return;
+  const PX_PER_SEC = 80;   // docelowa prędkość (px/s)
+  const MIN_SEC    = 12;   // minimalny czas cyklu, żeby nie było zbyt szybko
 
-  const STRENGTH = 110; // siła w px — podkręcisz jak chcesz
+  function buildCredits(c){
+    const track = c.querySelector('.credits-track');
+    if(!track) return;
 
-  let ticking = false;
-  function onScroll(){
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(update);
+    // zapamiętaj bazowy element (pierwszą linię) raz
+    if(!track.dataset.base){
+      const first = track.querySelector('.credits-line');
+      if(!first) return;
+      track.dataset.base = first.outerHTML;
+    }
+    const base = track.dataset.base;
+
+    // odbuduj tor od zera
+    track.innerHTML = '';
+
+    // tyle chcemy mieć łącznie: > 2× szerokość kontenera, żeby 0→-50% było bezszwowe
+    const target = c.clientWidth * 2.2;
+
+    let guard = 0;
+    do{
+      track.insertAdjacentHTML('beforeend', base);
+      guard++;
+      if(guard > 30) break;        // bezpiecznik
+    } while (track.scrollWidth < target);
+
+    // upewnij się, że liczba segmentów jest PARZYSTA (połówki identyczne)
+    if (track.children.length % 2 !== 0) {
+      track.insertAdjacentHTML('beforeend', base);
+    }
+
+    // przelicz prędkość: dystans pętli to połowa toru
+    const distance = track.scrollWidth / 2;          // px
+    const duration = Math.max(MIN_SEC, distance / PX_PER_SEC); // s
+    track.style.setProperty('--speed', `${duration}s`);
   }
 
-  function update(){
-    const vh = window.innerHeight;
-
-    galleries.forEach(g => {
-      const r = g.getBoundingClientRect();
-      // środek galerii względem środka viewportu → zakres ok. -1..1
-      const dist = (r.top + r.height/2 - vh/2) / vh;
-      const offset = dist * -STRENGTH;  // ujemny = „pod prąd” scrolla
-      g.style.setProperty('--float', offset.toFixed(2) + 'px');
-    });
-
-    ticking = false;
+  function init(){
+    document.querySelectorAll('.credits').forEach(buildCredits);
   }
 
-  window.addEventListener('scroll', onScroll, { passive:true });
-  window.addEventListener('resize', onScroll, { passive:true });
+  // po załadowaniu fontów (żeby pomiary szerokości były prawidłowe)
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve())
+    .then(init);
 
-  // pierwsza klatka
-  onScroll();
+  // przy zmianie rozmiaru – odbuduj z zapamiętanego "base"
+  window.addEventListener('resize', () => {
+    document.querySelectorAll('.credits').forEach(buildCredits);
+  });
 })();
 </script>
-
-  <script>
-(() => {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-  const rows = Array.from(document.querySelectorAll('.project-block .gallery'));
-  if (!rows.length) return;
-
-  const RATE_DESKTOP = 0.10;
-  const RATE_MOBILE  = 0.06;
-  const MAX_SHIFT_DESKTOP = 80;   // px — musi zgadzać się z bleedem
-  const MAX_SHIFT_MOBILE  = 40;
-
-  const meta = new Map();
-
-  function measure(){
-    const isMobile = matchMedia('(max-width:700px)').matches;
-    rows.forEach(row => {
-      const anchor = row.getBoundingClientRect().top + window.scrollY;
-      const maxShift = isMobile ? MAX_SHIFT_MOBILE : MAX_SHIFT_DESKTOP;
-      meta.set(row, {
-        anchor,
-        rate: isMobile ? RATE_MOBILE : RATE_DESKTOP,
-        max:  maxShift
-      });
-      // ustaw bleed dla tego rzędu (CSS nadpisze :root)
-      row.style.setProperty('--parallax-pad', maxShift + 'px');
-    });
-  }
-
-  function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
-
-  function update(){
-    const y = window.scrollY;
-    rows.forEach(row => {
-      const m = meta.get(row); if(!m) return;
-      let t = (y - m.anchor) * m.rate;        // liniowy, „warstwa z tyłu”
-      t = clamp(t, -m.max, m.max);            // nie odpływa
-      row.style.setProperty('--parallax-y', t.toFixed(1) + 'px'); // przesuwa WSZYSTKIE img w rzędzie identycznie
-    });
-  }
-
-  window.addEventListener('scroll', update, { passive:true });
-  window.addEventListener('resize', () => { measure(); update(); }, { passive:true });
-  window.addEventListener('pageshow', () => { measure(); update(); });
-
-  measure();
-  update();
-})();
-</script>
-
 </body>
 </html>
