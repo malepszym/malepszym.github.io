@@ -134,6 +134,32 @@
   #preloader .mm.loop,#preloader .mm.finalize{ animation:none }
 }
 
+    /* CTA pod creditsami */
+.cta-collab{
+  margin: clamp(28px, 10vh, 80px) 0;
+  text-align: center;
+}
+.cta-collab .collab-link{
+  display:inline-block;
+  font-family: "Archivo Black", system-ui, sans-serif;
+  font-size: clamp(40px, 8vw, 72px);
+  line-height: 1.05;
+  letter-spacing: .5px;
+  color: var(--fg);          /* czarny z Twojej palety */
+  text-decoration: none;     /* underline rysuje klasa link-underline */
+}
+
+/* (tylko jeśli na tej stronie NIE ma jeszcze .link-underline) */
+.link-underline{ position:relative; text-decoration:none; color:inherit }
+.link-underline::after{
+  content:""; position:absolute; left:0;
+  bottom: calc(var(--offset,6px) * -1);
+  height: var(--underline,3px);
+  width:0; background: currentColor;
+  transition: width .25s ease;
+}
+.link-underline:hover::after{ width:100% }
+
     
   </style>
 </head>
@@ -187,6 +213,10 @@
         <div class="credits-line" aria-hidden="true">kaja mann - olga starzynska - zofia lebiocka - paulina nowak</div>
       </div>
     </div>
+  <section class="cta-collab">
+  <a class="collab-link link-underline" href="/contact/">let’s collab!</a>
+</section>
+
   </main>
 
   <!-- LIGHTBOX -->
