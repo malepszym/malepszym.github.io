@@ -112,6 +112,29 @@
   will-change: transform;
   transform: translate3d(0,0,0); /* baseline, JS nadpisze inline */
 }
+
+    /* parallax – ile maksymalnie przesuwamy (JS to nadpisze) */
+:root{ --parallax-pad: 80px; }   /* fallback */
+
+.gallery .frame{ position:relative; overflow:hidden; }
+
+/* obraz jest większy o 2×pad i ustawiony absolutnie, więc ruch nie odsłania tła */
+.gallery .frame img{
+  position:absolute; left:0;
+  top: calc(var(--parallax-pad) * -1);
+  width:100%;
+  height: calc(100% + (var(--parallax-pad) * 2));
+  object-fit:cover;
+  will-change: transform;
+  transform: translate3d(0, var(--parallax-y, 0), 0);
+}
+
+/* filtr na hover dalej działa */
+.frame:hover img{ filter:grayscale(100%) contrast(.95) brightness(.98) }
+
+/* overlay zostaje przyklejony do ramki */
+.see-more{ position:absolute; inset:0; }
+
     
   /* meta pod galerią */
   .project-meta{ text-align:center; margin:clamp(24px,6vh,48px) 0 }
@@ -897,70 +920,53 @@
 </script>
   <script>
 (() => {
-  // Szacunek dla reduce-motion
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  // Bierzemy tylko rzędy z obrazkami
   const rows = Array.from(document.querySelectorAll('.project-block .gallery'));
   if (!rows.length) return;
 
-  // Parametry efektu
-  const RATE_DESKTOP = 0.09;   // zdjęcia poruszają się o 12% prędkości scrolla
-  const RATE_MOBILE  = 0.05;   // delikatniej na telefonie
-  const MAX_SHIFT_DESKTOP = 80; // maks. przesunięcie w px (cięcie „odpłynięcia”)
+  const RATE_DESKTOP = 0.10;
+  const RATE_MOBILE  = 0.06;
+  const MAX_SHIFT_DESKTOP = 80;   // px — musi zgadzać się z bleedem
   const MAX_SHIFT_MOBILE  = 40;
 
   const meta = new Map();
 
-  // policz stałe punkty odniesienia (top w dokumencie)
-  function measure() {
+  function measure(){
     const isMobile = matchMedia('(max-width:700px)').matches;
     rows.forEach(row => {
-      const rectTop = row.getBoundingClientRect().top + window.scrollY;
+      const anchor = row.getBoundingClientRect().top + window.scrollY;
+      const maxShift = isMobile ? MAX_SHIFT_MOBILE : MAX_SHIFT_DESKTOP;
       meta.set(row, {
-        anchor: rectTop,                            // gdzie rząd „zaczyna się” w dokumencie
-        rate:  isMobile ? RATE_MOBILE : RATE_DESKTOP,
-        max:   isMobile ? MAX_SHIFT_MOBILE : MAX_SHIFT_DESKTOP
+        anchor,
+        rate: isMobile ? RATE_MOBILE : RATE_DESKTOP,
+        max:  maxShift
       });
+      // ustaw bleed dla tego rzędu (CSS nadpisze :root)
+      row.style.setProperty('--parallax-pad', maxShift + 'px');
     });
   }
 
-  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+  function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
 
-  function update() {
-    const scrollY = window.scrollY;
-
+  function update(){
+    const y = window.scrollY;
     rows.forEach(row => {
-      const m = meta.get(row);
-      if (!m) return;
-
-      // Ile przewinęliśmy względem początku rzędu
-      const delta = scrollY - m.anchor;
-
-      // Efekt „warstwa z tyłu”: kiedy przewijasz w dół,
-      // obraz ma przesuwać się w górę wolniej → wewnątrz rzędu przesuwamy go LEKKO w dół
-      // (czyli dodatnie translateY kompensuje ruch strony).
-      let y =  delta * m.rate;
-
-      // Przytnij, żeby zdjęcia nie „odpływały” za mocno
-      y = clamp(y, -m.max, m.max);
-
-      row.querySelectorAll('.frame img').forEach(img => {
-        img.style.transform = `translate3d(0, ${y.toFixed(1)}px, 0)`;
-      });
+      const m = meta.get(row); if(!m) return;
+      let t = (y - m.anchor) * m.rate;        // liniowy, „warstwa z tyłu”
+      t = clamp(t, -m.max, m.max);            // nie odpływa
+      row.style.setProperty('--parallax-y', t.toFixed(1) + 'px'); // przesuwa WSZYSTKIE img w rzędzie identycznie
     });
   }
 
-  // RAF niepotrzebny – efekt jest liniowy i lekki
-  window.addEventListener('scroll', update, { passive: true });
-  window.addEventListener('resize', () => { measure(); update(); }, { passive: true });
-  window.addEventListener('pageshow', () => { measure(); update(); }); // bfcache Safari/Firefox
+  window.addEventListener('scroll', update, { passive:true });
+  window.addEventListener('resize', () => { measure(); update(); }, { passive:true });
+  window.addEventListener('pageshow', () => { measure(); update(); });
 
   measure();
   update();
 })();
 </script>
-
 
 </body>
 </html>
