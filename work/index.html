@@ -91,6 +91,16 @@
     align-items:stretch;
   }
 
+    /* kafelki muszą mieć wysokość, bo obraz będzie absolutny */
+.gallery .frame{
+  position: relative;       /* już masz, ale dodanie nie zaszkodzi */
+  overflow: hidden;         /* już masz */
+  aspect-ratio: 3 / 4;      /* ← nadaje wysokość (zmień np. na 4/5, jeśli wolisz) */
+}
+
+/* jedna wspólna zmienna przesunięcia dla całej galerii */
+.gallery{ --float: 0px; }
+    
   /* clickable tiles (no default button chrome) */
   .frame{
     appearance:none; -webkit-appearance:none;
@@ -107,11 +117,20 @@
   .frame:hover img{ filter:grayscale(100%) contrast(.95) brightness(.98) }
   .frame:focus-visible{ outline:3px solid #000; outline-offset:6px; border-radius:6px }
 
-    /* pływanie obrazków w galerii (parallax drift) */
+/* obraz „przyklejony” do kadru + lekki bleed, żeby nie było prześwitów przy ruchu */
 .gallery .frame img{
+  position: absolute;
+  left: 0; right: 0;
+  top: -6vh;                 /* bleed do góry */
+  height: calc(100% + 12vh); /* i do dołu */
+  width: 100%;
+  object-fit: cover;
+
+  transition: filter .25s ease;
+  transform: translate3d(0, var(--float), 0); /* wspólny drift */
   will-change: transform;
-  transform: translate3d(0,0,0); /* baseline, JS nadpisze inline */
 }
+
 
     /* parallax – ile maksymalnie przesuwamy (JS to nadpisze) */
 :root{ --parallax-pad: 80px; }   /* fallback */
@@ -224,6 +243,7 @@
     font-size:clamp(16px,2.2vw,22px); letter-spacing:.5px;
     text-transform:lowercase;
     opacity:0; transition:opacity .25s ease; pointer-events:none;
+    transform: translate3d(0, var(--float), 0); /* porusza się razem ze zdjęciem */
   }
   .see-more::before{ content:""; position:absolute; inset:0; background:rgba(0,0,0,.28) }
   .see-more span{ position:relative; z-index:1 }
@@ -852,72 +872,49 @@
   <script>
 (() => {
 
-  // Po załadowaniu fontów, żeby szerokość była poprawna
-  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve())
-    .then(normalizeCreditsSpeed);
-
   // Aktualizuj przy zmianie rozmiaru
   window.addEventListener('resize', normalizeCreditsSpeed);
 })();
 </script>
   <script>
 (() => {
-  // bez animacji – nic nie rób
+  // Szanuj preferencje użytkownika
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  const PX_PER_SEC = 80;   // docelowa prędkość (px/s)
-  const MIN_SEC    = 12;   // minimalny czas cyklu, żeby nie było zbyt szybko
+  const galleries = Array.from(document.querySelectorAll('.project-block .gallery'));
+  if (!galleries.length) return;
 
-  function buildCredits(c){
-    const track = c.querySelector('.credits-track');
-    if(!track) return;
+  const STRENGTH = 110; // siła w px — podkręcisz jak chcesz
 
-    // zapamiętaj bazowy element (pierwszą linię) raz
-    if(!track.dataset.base){
-      const first = track.querySelector('.credits-line');
-      if(!first) return;
-      track.dataset.base = first.outerHTML;
-    }
-    const base = track.dataset.base;
-
-    // odbuduj tor od zera
-    track.innerHTML = '';
-
-    // tyle chcemy mieć łącznie: > 2× szerokość kontenera, żeby 0→-50% było bezszwowe
-    const target = c.clientWidth * 2.2;
-
-    let guard = 0;
-    do{
-      track.insertAdjacentHTML('beforeend', base);
-      guard++;
-      if(guard > 30) break;        // bezpiecznik
-    } while (track.scrollWidth < target);
-
-    // upewnij się, że liczba segmentów jest PARZYSTA (połówki identyczne)
-    if (track.children.length % 2 !== 0) {
-      track.insertAdjacentHTML('beforeend', base);
-    }
-
-    // przelicz prędkość: dystans pętli to połowa toru
-    const distance = track.scrollWidth / 2;          // px
-    const duration = Math.max(MIN_SEC, distance / PX_PER_SEC); // s
-    track.style.setProperty('--speed', `${duration}s`);
+  let ticking = false;
+  function onScroll(){
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(update);
   }
 
-  function init(){
-    document.querySelectorAll('.credits').forEach(buildCredits);
+  function update(){
+    const vh = window.innerHeight;
+
+    galleries.forEach(g => {
+      const r = g.getBoundingClientRect();
+      // środek galerii względem środka viewportu → zakres ok. -1..1
+      const dist = (r.top + r.height/2 - vh/2) / vh;
+      const offset = dist * -STRENGTH;  // ujemny = „pod prąd” scrolla
+      g.style.setProperty('--float', offset.toFixed(2) + 'px');
+    });
+
+    ticking = false;
   }
 
-  // po załadowaniu fontów (żeby pomiary szerokości były prawidłowe)
-  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve())
-    .then(init);
+  window.addEventListener('scroll', onScroll, { passive:true });
+  window.addEventListener('resize', onScroll, { passive:true });
 
-  // przy zmianie rozmiaru – odbuduj z zapamiętanego "base"
-  window.addEventListener('resize', () => {
-    document.querySelectorAll('.credits').forEach(buildCredits);
-  });
+  // pierwsza klatka
+  onScroll();
 })();
 </script>
+
   <script>
 (() => {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
