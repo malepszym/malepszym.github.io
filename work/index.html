@@ -897,59 +897,46 @@
 </script>
   <script>
 (() => {
-  // szacunek dla prefers-reduced-motion
+  // wyłącz efekt dla prefers-reduced-motion
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  const imgs = Array.from(document.querySelectorAll('.gallery .frame img'));
-  if (!imgs.length) return;
+  // każdy rząd = .project-block .gallery
+  const rows = Array.from(document.querySelectorAll('.project-block .gallery'));
+  if (!rows.length) return;
 
   const meta = new Map();
 
-  function measure() {
-    const midX = window.innerWidth / 2;
+  function measure(){
     const isMobile = window.matchMedia('(max-width:700px)').matches;
-
-    imgs.forEach(img => {
-      const r = img.getBoundingClientRect();
-      const centerX = r.left + r.width / 2;
-
-      // lewa kolumna w górę, prawa w dół
-      const dir = centerX < midX ? -1 : 1;
-      // środkowe kafelki trochę mocniej
-      const midBoost = Math.abs(centerX - midX) < (r.width * 0.75) ? 1.35 : 1.0;
-
-      let strength = 140 * midBoost;      // <<— większa liczba = mocniejszy efekt
-      if (isMobile) strength *= 0.5;      // delikatniej na tel.
-
-      meta.set(img, { dir, strength, y: 0 });
+    rows.forEach(row => {
+      const ampBase = 70;                // ← siła efektu w px (zmień wg gustu)
+      const amp = isMobile ? ampBase*0.5 : ampBase;
+      meta.set(row, { amp, y: 0 });
     });
   }
 
   let ticking = false;
-  function onScroll() {
-    if (!ticking) {
-      ticking = true;
-      requestAnimationFrame(update);
-    }
+  function onScroll(){
+    if (!ticking) { ticking = true; requestAnimationFrame(update); }
   }
 
-  function update() {
+  function update(){
     const vh = window.innerHeight;
 
-    imgs.forEach(img => {
-      const s = meta.get(img);
+    rows.forEach(row => {
+      const s = meta.get(row);
       if (!s) return;
 
-      const r = img.getBoundingClientRect();
-      // od -1 (wysoko nad środkiem) do +1 (daleko pod środkiem)
-      const dist = (r.top + r.height / 2 - vh / 2) / vh;
+      const r = row.getBoundingClientRect();
+      // -1..1 względem środka ekranu (wspólny dla całego rzędu)
+      const dist = (r.top + r.height/2 - vh/2) / vh;
 
-      const target = s.dir * dist * s.strength;
-      // lekkie wygładzenie (lerp)
-      s.y += (target - s.y) * 0.10;
+      const target = dist * s.amp;       // jeden wspólny offset dla wszystkich 3 zdjęć
+      s.y += (target - s.y) * 0.12;      // wygładzenie (większa wartość = szybsza reakcja)
 
-      // bezpośrednio nadpisujemy transform – zero zmiennych CSS
-      img.style.transform = `translate3d(0, ${s.y.toFixed(2)}px, 0)`;
+      row.querySelectorAll('.frame img').forEach(img => {
+        img.style.transform = `translate3d(0, ${s.y.toFixed(1)}px, 0)`;
+      });
     });
 
     ticking = false;
@@ -959,10 +946,9 @@
   window.addEventListener('resize', () => { measure(); onScroll(); }, { passive: true });
 
   measure();
-  onScroll(); // pierwszy kadr
+  onScroll();   // pierwszy kadr
 })();
 </script>
-
 
 </body>
 </html>
