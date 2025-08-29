@@ -269,13 +269,14 @@
     const gallery = document.getElementById('gallery');
     const thumbs  = document.getElementById('thumbs');
     IMAGES.slice(0,3).forEach((src,i)=>{
-      const b = document.createElement('button');
-      b.className = `frame reveal ${['from-left','from-bottom','from-right'][i]} delay-${i+1}`; b.type='button'; b.setAttribute('aria-label',`Open image ${i+1}`);
-      b.innerHTML = `<img src="${src}" alt="Remains — photo ${i+1}">`;
-      b.addEventListener('click', ()=> openLightbox(i));
-      gallery.appendChild(b);
-    });
-    <script>
+  const b = document.createElement('button');
+  b.className = `frame reveal ${['from-left','from-bottom','from-right'][i]} delay-${i+1}`;
+  b.type='button'; b.setAttribute('aria-label',`Open image ${i+1}`);
+  b.innerHTML = `<img src="${src}" alt="Remains — photo ${i+1}">`;
+  b.addEventListener('click', ()=> openLightbox(i));
+  gallery.appendChild(b);
+});
+
 /* ===== uruchom „reveal on scroll” ===== */
 (() => {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -293,14 +294,15 @@
 
   els.forEach(el => io.observe(el));
 })();
-</script>
 
-    IMAGES.forEach((src,i)=>{
-      const t = document.createElement('button');
-      t.className='thumb'; t.type='button'; t.innerHTML = `<img src="${src}" alt="">`;
-      t.addEventListener('click', ()=> openLightbox(i));
-      thumbs.appendChild(t);
-    });
+IMAGES.forEach((src,i)=>{
+  const t = document.createElement('button');
+  t.className='thumb'; t.type='button';
+  t.innerHTML = `<img src="${src}" alt="">`;
+  t.addEventListener('click', ()=> openLightbox(i));
+  thumbs.appendChild(t);
+});
+
 
     /* Lightbox */
     const overlay = document.getElementById('lightbox');
